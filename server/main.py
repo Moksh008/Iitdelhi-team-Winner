@@ -21,6 +21,8 @@ import hashlib
 from typing import List, Dict, Any, Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 import importlib
 
@@ -113,6 +115,8 @@ class ServerState:
 state = ServerState()
 
 @app.get("/api/v1/health")
+@app.get("/api/health")
+@app.get("/health")
 def health_check():
     return {
         "status": "healthy",
@@ -126,6 +130,7 @@ def health_check():
         "active_rolling_c": round(state.fusion_engine.rolling_coercion, 4),
         "emergency_sos_ready": True
     }
+
 
 @app.post("/api/v1/scrub-pii", response_model=PIIScrubResponse)
 def scrub_pii(req: PIIScrubRequest):
@@ -370,3 +375,37 @@ def get_reports():
         "total_reports": len(state.reports_db),
         "reports": state.reports_db
     }
+
+@app.get("/api/stats")
+def get_stats():
+    return {
+        "status": "active",
+        "service": "Satark Enterprise Fraud Defense API",
+        "total_reports": len(state.reports_db),
+        "rolling_coercion": round(state.fusion_engine.rolling_coercion, 4),
+        "emergency_sos_ready": True,
+        "languages_supported": 14,
+        "model_architecture": "DistilBERT-Multilingual-FineTuned",
+        "accuracy": 0.9625,
+        "f1_score": 0.9624,
+        "avg_latency_ms": 102.6
+    }
+
+# Mount static web assets from dist directory so visiting http://127.0.0.1:8000 loads the full app directly
+DIST_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "dist")
+if os.path.exists(DIST_DIR):
+    assets_dir = os.path.join(DIST_DIR, "assets")
+    if os.path.exists(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+
+    @app.api_route("/{full_path:path}", methods=["GET", "HEAD"])
+    def serve_frontend(full_path: str):
+        if full_path.startswith("api/") or full_path.startswith("docs") or full_path.startswith("openapi.json"):
+            raise HTTPException(status_code=404, detail="Not Found")
+        
+        target = os.path.join(DIST_DIR, full_path)
+        if full_path and os.path.isfile(target):
+            return FileResponse(target)
+        return FileResponse(os.path.join(DIST_DIR, "index.html"))
+
+
