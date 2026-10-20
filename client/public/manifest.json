@@ -1,0 +1,16 @@
+{
+  "short_name": "Satark",
+  "name": "Satark (सतर्क) · Pre-Payment Scam Shield for UPI",
+  "icons": [
+    {
+      "src": "/logo.jpg",
+      "type": "image/jpeg",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#090d16",
+  "theme_color": "#090d16",
+  "display": "standalone",
+  "orientation": "portrait"
+}

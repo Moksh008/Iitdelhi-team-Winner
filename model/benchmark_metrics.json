@@ -1,0 +1,31 @@
+{
+  "model_architecture": "distilbert-base-multilingual-cased-HF-Real",
+  "primary_benchmarks": [
+    "anmolshrivastav/scam_ham_india_14_languages (14 Indian Languages)",
+    "rishia2220/icfd-31k (Official Indian Conversational Fraud Dataset)"
+  ],
+  "supported_languages": [
+    "Hindi",
+    "Gujarati",
+    "Marathi",
+    "Bengali",
+    "Tamil",
+    "Telugu",
+    "Punjabi",
+    "Kannada",
+    "Malayalam",
+    "Oriya",
+    "Assamese",
+    "Hinglish",
+    "English"
+  ],
+  "dataset_sample_size": 2000,
+  "holdout_test_size": 400,
+  "accuracy": 0.9625,
+  "precision": 0.9648,
+  "recall": 0.96,
+  "f1_score": 0.9624,
+  "target_f1_baseline": 0.956,
+  "inference_latency_ms": 102.61,
+  "status": "Production-Grade Fine-Tuned Model Active"
+}
