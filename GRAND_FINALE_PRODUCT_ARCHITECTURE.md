@@ -137,7 +137,7 @@ Follow this step-by-step walkthrough to wow the judges during the live pitch:
    - **PII Redaction**: Any Aadhaar or account numbers are scrubbed on-device to `[AADHAAR-REDACTED]`.
 
 ### Scene 2: Mid-Call UPI Payment Attempt (The Interception)
-1. In the simulator, click **"Pay via UPI"** to simulate the victim switching to PhonePe or Google Pay while remaining on the call.
+1. Use a clearly labelled synthetic payment fixture only in automated tests; production does not simulate or initiate payments.
 2. The **Floating Shield Overlay** persists above the payment UI.
 3. The app executes the **Tri-Signal Multimodal Fusion Engine**:
    - Evaluates $C_t = 0.94$, $S_{\text{acoustic}} = 0.84$, and $M_{\text{payment}} = 0.82$.

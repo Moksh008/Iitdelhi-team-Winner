@@ -55,6 +55,59 @@ class PIIScrubResponse(BaseModel):
     scrubbed_text: str
     redactions_found: bool
 
+class TranscriptChunkRequest(BaseModel):
+    session_id: str = Field(..., min_length=1)
+    sequence: int = Field(..., ge=0)
+    text: str = Field(..., min_length=1)
+    language: Optional[str] = "en"
+    is_final: bool = False
+
+class ClaimEntity(BaseModel):
+    type: str
+    text: str
+    normalized_text: Optional[str] = None
+    confidence: float = Field(..., ge=0.0, le=1.0)
+    source: str
+
+class ClaimContact(BaseModel):
+    name: str
+    type: str
+    phone: str
+    address: str
+    source: str
+    verification_status: str
+    confidence: float = Field(..., ge=0.0, le=1.0)
+    last_verified_at: Optional[str] = None
+    distance_km: Optional[float] = None
+    retrieved_at: Optional[str] = None
+
+class ClaimVerificationResponse(BaseModel):
+    entities: List[ClaimEntity]
+    contacts: List[ClaimContact]
+    recommended_action: str
+    provider: str
+    notice: Optional[str] = None
+
+class VerificationEventRequest(BaseModel):
+    session_id: str = Field(..., min_length=1)
+    contact_name: str = Field(..., min_length=1)
+    outcome: str = Field(..., min_length=1)
+
+class NearbyPlacesRequest(BaseModel):
+    query: str = Field(..., min_length=2)
+    category: Optional[str] = Field("hospital", min_length=2, max_length=80)
+    limit: int = Field(5, ge=1, le=20)
+
+class TranscriptAnalysisResponse(ClaimVerificationResponse):
+    scam_probability: float = Field(..., ge=0.0, le=1.0)
+    rolling_c: float = Field(..., ge=0.0, le=1.0)
+    action_tier: int = Field(..., ge=0, le=2)
+    risk_level: str
+    detected_language: str
+    evidence_indicators: List[str]
+    recommended_verification_steps: List[str]
+    place_category: Optional[str] = None
+
 class PaymentEvaluationRequest(BaseModel):
     payee_vpa: str = Field(..., description="Beneficiary UPI ID")
     payee_name: Optional[str] = "Unknown Payee"

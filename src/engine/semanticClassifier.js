@@ -40,6 +40,21 @@ export class SemanticScamClassifier {
         ]
       },
 
+      // 4. Family-emergency payment pressure; requires a medical and payment signal.
+      EMERGENCY_PAYMENT: {
+        weight: 0.82,
+        medical: [
+          'child admitted', 'child has been admitted', 'son admitted', 'daughter admitted',
+          'child in hospital', 'hospital admission', 'hospital bill', 'medical emergency',
+          'admitted to the hospital', 'relative admitted', 'બાળક હોસ્પિટલમાં', 'मुलाला रुग्णालयात'
+        ],
+        payment: [
+          'need money', 'send money', 'transfer money', 'pay the bill', 'admission fee',
+          'entrance bill', 'hospital fees', 'send it now', 'money immediately',
+          'પૈસા મોકલો', 'तुरंत पैसे', 'पैसे भेजो'
+        ]
+      },
+
       // 2. Coerced Isolation & Secrecy Mandates
       ISOLATION: {
         weight: 0.88,
@@ -135,6 +150,7 @@ export class SemanticScamClassifier {
     let authorityScore = 0.0;
     let isolationScore = 0.0;
     let urgencyScore = 0.0;
+    let emergencyPaymentScore = 0.0;
 
     // 1. Evaluate Authority Cluster
     for (const token of this.intentClusters.AUTHORITY.tokens) {
@@ -142,6 +158,15 @@ export class SemanticScamClassifier {
         authorityScore = Math.max(authorityScore, this.intentClusters.AUTHORITY.weight);
         matchedTokens.push({ cluster: 'Authority', token });
       }
+    }
+
+    const hasMedicalEmergency = this.intentClusters.EMERGENCY_PAYMENT.medical
+      .some(token => normalized.includes(token.toLowerCase()));
+    const hasPaymentRequest = this.intentClusters.EMERGENCY_PAYMENT.payment
+      .some(token => normalized.includes(token.toLowerCase()));
+    if (hasMedicalEmergency && hasPaymentRequest) {
+      emergencyPaymentScore = this.intentClusters.EMERGENCY_PAYMENT.weight;
+      matchedTokens.push({ cluster: 'Emergency Payment', token: 'medical emergency + payment request' });
     }
 
     // 2. Evaluate Isolation Cluster
@@ -165,6 +190,10 @@ export class SemanticScamClassifier {
     let finalScore = 0.0;
     if (authorityScore > 0 && (isolationScore > 0 || urgencyScore > 0)) {
       finalScore = Math.min(1.0, Math.max(authorityScore, isolationScore, urgencyScore) + 0.08);
+    } else if (emergencyPaymentScore > 0 && (isolationScore > 0 || urgencyScore > 0)) {
+      finalScore = Math.min(1.0, Math.max(emergencyPaymentScore, isolationScore, urgencyScore) + 0.08);
+    } else if (emergencyPaymentScore > 0) {
+      finalScore = emergencyPaymentScore * 0.80;
     } else if (authorityScore > 0) {
       finalScore = authorityScore * 0.85;
     } else if (isolationScore > 0 || urgencyScore > 0) {
@@ -178,6 +207,8 @@ export class SemanticScamClassifier {
       detectedCategory = 'Authority Impersonation';
     } else if (urgencyScore > 0) {
       detectedCategory = 'Financial Urgency / KYC';
+    } else if (emergencyPaymentScore > 0) {
+      detectedCategory = 'Emergency Payment Verification';
     }
 
     return {
@@ -187,6 +218,7 @@ export class SemanticScamClassifier {
         authority: authorityScore > 0,
         isolation: isolationScore > 0,
         urgency: urgencyScore > 0
+        , emergencyPayment: emergencyPaymentScore > 0
       },
       matches: matchedTokens
     };

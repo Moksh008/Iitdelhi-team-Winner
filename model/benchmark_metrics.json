@@ -19,13 +19,13 @@
     "Hinglish",
     "English"
   ],
-  "dataset_sample_size": 2000,
-  "holdout_test_size": 400,
-  "accuracy": 0.9625,
-  "precision": 0.9648,
-  "recall": 0.96,
-  "f1_score": 0.9624,
+  "dataset_sample_size": 2480,
+  "holdout_test_size": 496,
+  "accuracy": 0.9637,
+  "precision": 0.9794,
+  "recall": 0.9482,
+  "f1_score": 0.9636,
   "target_f1_baseline": 0.956,
-  "inference_latency_ms": 102.61,
+  "inference_latency_ms": 38.34,
   "status": "Production-Grade Fine-Tuned Model Active"
 }

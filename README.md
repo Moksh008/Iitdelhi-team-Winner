@@ -1,99 +1,65 @@
-# Project Satark (सतर्क)
-### Real-Time Multilingual Pre-Payment Scam Shield for UPI
-**Winner · Raksham AI Cybersecurity Hackathon · Problem Statement 02**
+# SATARK (सतर्क)
 
-> *"The scam shield that steps in **before** the UPI payment, not after."*
+Satark is a consent-based pre-payment scam shield. Its native Android
+call-time experience is a small Compose floating bubble that analyzes only
+explicitly supported speech/transcript input. It expands into a compact
+warning panel only when actual analysis returns relevant indicators. The
+React/Vite dashboard remains available as a fallback and development surface.
 
----
+This repository currently uses a React/Vite mobile UI packaged with Capacitor
+and a small native Android overlay service. It is not a pure Kotlin/Compose
+application yet. The implementation status is recorded in
+[docs/11_IMPLEMENTATION_STATUS_AND_ROADMAP.md](docs/11_IMPLEMENTATION_STATUS_AND_ROADMAP.md).
 
-## Architecture Overview (`client`, `server`, `model`)
+## Quick start
 
-Satark is structured into three clean, enterprise-grade modules:
-
-```
-d:\Hackathons\iitdelhi\
-│
-├── client/                     # Mobile-First Frontend Application (React + Vite + Capacitor)
-│   ├── android/                # Native Android Studio Project & APK build outputs
-│   ├── src/                    # 22-Language Localization, Dynamic Decision Engine & Scenarios
-│   │   ├── components/         # Mobile components, Studio telemetry, Bank reviewer console
-│   │   ├── engine/             # Decision state machine, Multilingual intent engine
-│   │   └── App.jsx             # Dual-view coordinator (Mobile + Studio Console)
-│   ├── public/                 # PWA manifest, official holographic brand logo
-│   └── package.json            # Client dependencies (React 19, Lucide, Confetti, Capacitor)
-│
-├── server/                     # Production FastAPI Microservice Backend
-│   ├── main.py                 # FastAPI Application with Endpoints for 3s Chunks, Payments & 1930
-│   ├── schemas.py              # Pydantic Schemas for Requests & Tier-3 Report Packs
-│   └── requirements.txt        # FastAPI, Uvicorn, Pydantic
-│
-├── model/                      # Multilingual AI Model Pipeline (ICFD-31k)
-│   ├── dataset_generator.py    # Generates 1,200+ Multilingual 3-second streaming chunks
-│   ├── train_distilbert_icfd31k.py # Fine-tunes Multilingual DistilBERT on ICFD-31k with F1 benchmarks
-│   ├── infer.py                # Standalone CLI inference across all Indian languages
-│   └── requirements.txt        # PyTorch, Transformers, Scikit-learn
-│
-├── PRD.md                      # Complete Enterprise Product Requirements Document
-└── MOBILE_CONVERSION.md        # Guide for compiling native Android APK via Android Studio / Capacitor
-```
-
----
-
-## 1. Client Module (`client/`)
-
-The client delivers a responsive, dual-view experience:
-1. **Protected Mobile UI**:
-   - **Cellular & WhatsApp Call Interceptor**: Ingests live audio or simulated speech in Hindi, Gujarati, Marathi, Tamil, Telugu, etc.
-   - **Tier 1 Nudge**: Floating heads-up banner naming the scam pattern.
-   - **PayRaksham UPI App**: Intercepts payment intent **before** the UPI PIN screen.
-   - **Tier 2 Pause Modal**: 60-second cooldown timer, targeted scam question, and 3 explicit actions.
-   - **Tier 3 One-Tap Report**: Zero-knowledge prefilled 1930 & Bank Evidence Pack with SHA-256 hashed beneficiary.
-2. **22 Scheduled Indian Languages**: Instant localization across all Eighth Schedule languages.
-3. **Cyber Defense Studio**: Real-time meters for $C_{\text{rolling}}$, $P_{\text{payment}}$, dual-signal gate, and Bank Reviewer Console with 2-hour lien placement.
-
-### Running Client
-```bash
-cd client
+```powershell
+npm install
 npm run dev
 ```
-Open **`http://localhost:3000/`** (or across Wi-Fi on physical mobile phone).
 
----
+Run the API separately:
 
-## 2. Server Module (`server/`)
-
-FastAPI microservice handling real-time chunk scoring, pre-payment risk evaluation, and the National Cybercrime Portal (1930) gateway.
-
-### Running Server
-```bash
-cd server
+```powershell
+Set-Location server
 pip install -r requirements.txt
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-```
-Interactive API docs at **`http://localhost:8000/docs`**.
-
----
-
-## 3. Model Pipeline (`model/`)
-
-Fine-tuning and evaluation pipeline for **Multilingual DistilBERT** on the **ICFD-31k** (Indian Conversational Fraud Dataset).
-- **Supported Languages**: Hindi, Gujarati, Marathi, Bengali, Tamil, Telugu, Punjabi, Hinglish, English.
-- **Benchmark Target**: F1 Score `0.956` (Slide 6 & 13 of PRD).
-
-### Generating Dataset & Training Model
-```bash
-cd model
-python dataset_generator.py
-python train_distilbert_icfd31k.py
+uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 
-### Running Inference
-```bash
-python infer.py "હું સીબીઆઈ હેડક્વાર્ટર દિલ્હીથી ઇન્સ્પેક્ટર બોલું છું, પૈસા સુરક્ષિત ખાતામાં મોકલો"
+Build the debug APK:
+
+```powershell
+Set-Location D:\Satark-main
+npm run build
+npx cap sync android
+Set-Location android
+.\gradlew.bat assembleDebug
 ```
 
----
+APK: `android\app\build\outputs\apk\debug\app-debug.apk`.
 
-## Team Winner
-* **Team Leader**: Moksh Kulshrestha
-* **Team Members**: Piyush Wahi, Shivam Thakur
+The native overlay requires user-granted overlay permission and microphone
+permission before speech sensing. Ordinary cellular and WhatsApp call audio
+is not assumed to be accessible. The native bridge exposes
+`SatarkNative.startSensing`, `SatarkNative.stopSensing`, and
+`SatarkNative.openOverlaySettings` to the React fallback.
+
+## Safety boundaries
+
+Satark does not promise access to both sides of an ordinary cellular call.
+Nearby listings and phone numbers are provider data, not proof of an incident.
+The app does not place calls automatically, send money, or embed Azure secrets.
+
+## Documentation
+
+1. [Product and scope](docs/01_PRODUCT_AND_SCOPE.md)
+2. [UI reference](docs/02_UI_REFERENCE_AND_SCREENS.md)
+3. [Android setup](docs/03_ANDROID_SETUP_AND_PERMISSIONS.md)
+4. [Architecture](docs/04_ARCHITECTURE_AND_FOLDER_STRUCTURE.md)
+5. [AI and transcript pipeline](docs/05_LOCAL_AI_AND_TRANSCRIPT_PIPELINE.md)
+6. [Azure Maps](docs/06_AZURE_MAPS_SETUP_AND_API.md)
+7. [Cache and privacy](docs/07_DATABASE_CACHE_AND_PRIVACY.md)
+8. [Verification and dialer](docs/08_VERIFICATION_PANEL_AND_DIALER.md)
+9. [Testing](docs/09_TESTING_AND_ACCEPTANCE.md)
+10. [Build and demo](docs/10_BUILD_RUN_AND_DEMO.md)
+11. [Status and roadmap](docs/11_IMPLEMENTATION_STATUS_AND_ROADMAP.md)

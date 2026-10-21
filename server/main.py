@@ -19,12 +19,13 @@ import math
 import time
 import hashlib
 from typing import List, Dict, Any, Optional
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
 
 import importlib
+from dotenv import load_dotenv
+
+load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"))
 
 # Ensure model directory is on sys.path
 MODEL_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "model")
@@ -67,10 +68,16 @@ from schemas import (
     EmergencySOSRequest,
     EmergencySOSResponse,
     PIIScrubRequest,
-    PIIScrubResponse
+    PIIScrubResponse,
+    TranscriptChunkRequest,
+    ClaimVerificationResponse,
+    VerificationEventRequest
+    , NearbyPlacesRequest, TranscriptAnalysisResponse
 )
 
 from fusion_engine import PIIScrubber, ScamPsychologyAnalyzer, TriSignalFusionEngine
+from claim_verification import resolve_claim, nearby_places
+from language_detection import detect_transcript_language
 
 app = FastAPI(
     title="Project Satark (सतर्क) Enterprise API",
@@ -86,6 +93,44 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+class VoipRoomManager:
+    def __init__(self):
+        self.rooms: Dict[str, List[WebSocket]] = {}
+
+    async def join(self, room_id: str, websocket: WebSocket):
+        await websocket.accept()
+        peers = self.rooms.setdefault(room_id, [])
+        peers.append(websocket)
+        await websocket.send_json({"type": "room-joined", "peer_count": len(peers)})
+        for peer in peers[:-1]:
+            await peer.send_json({"type": "peer-joined"})
+
+    async def leave(self, room_id: str, websocket: WebSocket):
+        peers = self.rooms.get(room_id, [])
+        if websocket in peers:
+            peers.remove(websocket)
+        for peer in peers:
+            await peer.send_json({"type": "peer-left"})
+        if not peers:
+            self.rooms.pop(room_id, None)
+
+    async def relay(self, room_id: str, sender: WebSocket, message: Dict[str, Any]):
+        for peer in self.rooms.get(room_id, []):
+            if peer is not sender:
+                await peer.send_json(message)
+
+voip_rooms = VoipRoomManager()
+
+@app.websocket("/ws/voip/{room_id}")
+async def voip_signaling(websocket: WebSocket, room_id: str):
+    await voip_rooms.join(room_id, websocket)
+    try:
+        while True:
+            message = await websocket.receive_json()
+            await voip_rooms.relay(room_id, websocket, message)
+    except WebSocketDisconnect:
+        await voip_rooms.leave(room_id, websocket)
 
 # Global State Management
 class ServerState:
@@ -114,23 +159,102 @@ class ServerState:
 
 state = ServerState()
 
+@app.post("/api/v1/claim-verification", response_model=ClaimVerificationResponse)
+def claim_verification(req: TranscriptChunkRequest):
+    scrubbed = PIIScrubber.scrub(req.text.strip())
+    if not scrubbed:
+        raise HTTPException(status_code=400, detail="Transcript text cannot be empty")
+    return resolve_claim(scrubbed)
+
+@app.post("/api/v1/verification-events")
+def verification_event(req: VerificationEventRequest):
+    allowed_outcomes = {
+        "confirmed_by_official_source",
+        "incident_reported_but_identity_unconfirmed",
+        "not_confirmed",
+        "contact_unavailable",
+        "user_declined",
+        "conflicting_information",
+    }
+    if req.outcome not in allowed_outcomes:
+        raise HTTPException(status_code=400, detail="Unsupported verification outcome")
+    return {"accepted": True, "session_id": req.session_id, "outcome": req.outcome}
+
+@app.post("/api/v1/analyze-text", response_model=TranscriptAnalysisResponse)
+@app.post("/api/v1/transcript-chunk", response_model=TranscriptAnalysisResponse)
+def analyze_transcript_chunk(req: TranscriptChunkRequest):
+    """Analyze a consented transcript chunk with scam scoring and claim lookup."""
+    scrubbed = PIIScrubber.scrub(req.text.strip())
+    if not scrubbed:
+        raise HTTPException(status_code=400, detail="Transcript text cannot be empty")
+    detected_language = (
+        detect_transcript_language(scrubbed)
+        if not req.language or req.language.lower() == "auto"
+        else req.language.lower()
+    )
+    inference_fn = get_inference_fn()
+    score = 0.0
+    if inference_fn is not None:
+        try:
+            score = float(inference_fn(scrubbed)["scam_probability"])
+        except (KeyError, TypeError, ValueError, RuntimeError):
+            score = 0.0
+    claim = resolve_claim(scrubbed)
+    if claim["recommended_action"] == "VERIFY_BEFORE_PAYMENT":
+        score = max(score, 0.78)
+    rolling_c = state.fusion_engine.update_coercion_stream(score, False)
+    tier = 2 if score >= 0.80 else (1 if score >= 0.65 else 0)
+    entities = claim["entities"]
+    evidence_indicators = [
+        entity["type"].replace("_", " ").title()
+        for entity in entities
+        if entity.get("type") not in {"LOCATION", "HOSPITAL"}
+    ]
+    if claim["recommended_action"] == "VERIFY_BEFORE_PAYMENT":
+        evidence_indicators.append("Payment request combined with an emergency or authority claim")
+    if tier >= 2:
+        risk_level = "high"
+    elif tier == 1:
+        risk_level = "caution"
+    elif not evidence_indicators and not entities:
+        risk_level = "insufficient_evidence"
+    else:
+        risk_level = "low"
+    return {
+        **claim,
+        "scam_probability": round(score, 4),
+        "rolling_c": round(rolling_c, 4),
+        "action_tier": tier,
+        "risk_level": risk_level,
+        "detected_language": detected_language,
+        "evidence_indicators": evidence_indicators,
+        "recommended_verification_steps": [
+            "Verify the claim using an independently sourced official contact.",
+            "Do not share OTPs or send money under pressure.",
+        ],
+        "place_category": claim.get("place_category"),
+    }
+
+@app.post("/api/v1/places/search")
+@app.post("/api/v1/nearby-places")
+def nearby_places_lookup(req: NearbyPlacesRequest):
+    return nearby_places(req.query, req.category or "hospital", req.limit)
+
 @app.get("/api/v1/health")
-@app.get("/api/health")
-@app.get("/health")
 def health_check():
     return {
         "status": "healthy",
         "service": "Satark Enterprise Fraud Defense API",
         "architecture": "Tri-Signal Multimodal (DistilBERT + Acoustic Voice Clone + UPI Graph)",
         "supported_languages": [
-            "Hindi", "Gujarati", "Marathi", "Bengali", "Tamil", "Telugu",
-            "Punjabi", "Kannada", "Malayalam", "Odia", "Assamese", "Hinglish", "English"
+            "English", "Hindi", "Hinglish", "Bengali", "Assamese", "Gujarati",
+            "Marathi", "Punjabi", "Urdu", "Nepali", "Tamil", "Telugu",
+            "Kannada", "Malayalam", "Odia",
         ],
         "compliance": "DPDP Act 2023 & RBI FREE-AI",
         "active_rolling_c": round(state.fusion_engine.rolling_coercion, 4),
         "emergency_sos_ready": True
     }
-
 
 @app.post("/api/v1/scrub-pii", response_model=PIIScrubResponse)
 def scrub_pii(req: PIIScrubRequest):
@@ -176,9 +300,17 @@ def classify_chunk(req: ChunkClassificationRequest):
         score = max(score, 0.88)
         category = "Digital Arrest / Impersonation"
 
+    # Family-emergency payment requests need verification, but are not proof of fraud.
+    medical_terms = ("hospital", "admitted", "ambulance", "emergency", "icu", "रुग्णालय", "अस्पताल")
+    payment_terms = ("need money", "send money", "transfer money", "bill", "pay", "पैसे", "रक्कम")
+    family_terms = ("child", "son", "daughter", "father", "mother", "relative", "बच्चा", "मुलगा", "मुलगी")
+    if any(term in lower for term in medical_terms) and any(term in lower for term in payment_terms) and any(term in lower for term in family_terms):
+        score = max(score, 0.78)
+        category = "Emergency Payment Verification"
+
     # Update rolling accumulator
     rolling_c = state.fusion_engine.update_coercion_stream(score, req.is_flagged_number)
-    action_tier = 2 if rolling_c >= 0.80 else (1 if rolling_c >= 0.65 else 0)
+    action_tier = 2 if rolling_c >= 0.80 else (1 if rolling_c >= 0.65 or score >= 0.65 else 0)
 
     return ChunkClassificationResponse(
         text=scrubbed,
@@ -375,37 +507,3 @@ def get_reports():
         "total_reports": len(state.reports_db),
         "reports": state.reports_db
     }
-
-@app.get("/api/stats")
-def get_stats():
-    return {
-        "status": "active",
-        "service": "Satark Enterprise Fraud Defense API",
-        "total_reports": len(state.reports_db),
-        "rolling_coercion": round(state.fusion_engine.rolling_coercion, 4),
-        "emergency_sos_ready": True,
-        "languages_supported": 14,
-        "model_architecture": "DistilBERT-Multilingual-FineTuned",
-        "accuracy": 0.9625,
-        "f1_score": 0.9624,
-        "avg_latency_ms": 102.6
-    }
-
-# Mount static web assets from dist directory so visiting http://127.0.0.1:8000 loads the full app directly
-DIST_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "dist")
-if os.path.exists(DIST_DIR):
-    assets_dir = os.path.join(DIST_DIR, "assets")
-    if os.path.exists(assets_dir):
-        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
-
-    @app.api_route("/{full_path:path}", methods=["GET", "HEAD"])
-    def serve_frontend(full_path: str):
-        if full_path.startswith("api/") or full_path.startswith("docs") or full_path.startswith("openapi.json"):
-            raise HTTPException(status_code=404, detail="Not Found")
-        
-        target = os.path.join(DIST_DIR, full_path)
-        if full_path and os.path.isfile(target):
-            return FileResponse(target)
-        return FileResponse(os.path.join(DIST_DIR, "index.html"))
-
-

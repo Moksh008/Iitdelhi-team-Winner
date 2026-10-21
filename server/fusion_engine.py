@@ -63,6 +63,10 @@ class ScamPsychologyAnalyzer:
         "Financial Threat / Seizure": [
             r'\b(freeze account|penalty|legal action|court notice|asset seizure|narcotics parcel)\b',
             r'(खाता सीज|पेनल्टी|कोर्ट|पार्सल|ड्रग्स|જપ્તી|நீதிமன்றம்)'
+        ],
+        "Emergency Payment Pressure": [
+            r'\b(child|son|daughter|relative).*(hospital|admitted|icu|medical emergency).*(money|bill|pay|transfer)\b',
+            r'\b(hospital|admitted|icu|medical emergency).*(child|son|daughter|relative).*(money|bill|pay|transfer)\b'
         ]
     }
 

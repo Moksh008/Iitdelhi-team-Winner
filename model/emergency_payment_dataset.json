@@ -1,0 +1,3362 @@
+[
+  {
+    "text": "Your child has been admitted to the hospital. Send ₹25,000 immediately for the admission bill.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "This is the hospital desk. Your son needs urgent treatment. Transfer ₹50,000 now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your daughter met with an accident and is in ICU. Pay the emergency charges within ten minutes.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The doctor has started surgery for your father. Send the money to this account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your mother's phone is unavailable after the accident. Do not call them; pay the hospital fee now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "We need an urgent deposit for your brother's treatment. Please transfer the amount before discharge.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your sister is in emergency care. Send the admission fee to this new UPI account right away.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The ambulance brought your child here. Pay the medical bill now or treatment will stop.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your son has been admitted and the billing counter needs payment immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Please keep this confidential. Your daughter is in the hospital; send the surgery money now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your father has been admitted to the hospital. Visiting hours are at tomorrow morning.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital has registered your mother. Please bring the insurance card to reception.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is stable and the doctor will speak with the family during visiting hours.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital billing desk is open until 6 PM; please use the official counter for any payment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child is receiving treatment. Call the hospital's published number for details.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The admission paperwork for your son is ready at reception; no payment is requested by phone.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your daughter will call after the examination. Please contact the family coordinator if needed.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The doctor has scheduled a consultation for your father tomorrow at 6 PM.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Please bring identification and insurance documents for your mother's hospital admission.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is safe. The hospital will provide the treatment estimate through its official portal.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child has been admitted to the hospital. Send ₹50,000 immediately for the admission bill.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "This is the hospital desk. Your son needs urgent treatment. Transfer the admission fee now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your daughter met with an accident and is in ICU. Pay the emergency charges within ten minutes.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The doctor has started surgery for your father. Send the money to this account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your mother's phone is unavailable after the accident. Do not call them; pay the hospital fee now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "We need an urgent deposit for your brother's treatment. Please transfer the amount before discharge.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your sister is in emergency care. Send the admission fee to this new UPI account right away.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The ambulance brought your child here. Pay the medical bill now or treatment will stop.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your son has been admitted and the billing counter needs payment immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Please keep this confidential. Your daughter is in the hospital; send the surgery money now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your father has been admitted to the hospital. Visiting hours are at the scheduled appointment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital has registered your mother. Please bring the insurance card to reception.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is stable and the doctor will speak with the family during visiting hours.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital billing desk is open until tomorrow morning; please use the official counter for any payment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child is receiving treatment. Call the hospital's published number for details.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The admission paperwork for your son is ready at reception; no payment is requested by phone.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your daughter will call after the examination. Please contact the family coordinator if needed.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The doctor has scheduled a consultation for your father tomorrow at tomorrow morning.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Please bring identification and insurance documents for your mother's hospital admission.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is safe. The hospital will provide the treatment estimate through its official portal.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child has been admitted to the hospital. Send the admission fee immediately for the admission bill.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "This is the hospital desk. Your son needs urgent treatment. Transfer the treatment deposit now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your daughter met with an accident and is in ICU. Pay the emergency charges within ten minutes.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The doctor has started surgery for your father. Send the money to this account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your mother's phone is unavailable after the accident. Do not call them; pay the hospital fee now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "We need an urgent deposit for your brother's treatment. Please transfer the amount before discharge.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your sister is in emergency care. Send the admission fee to this new UPI account right away.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The ambulance brought your child here. Pay the medical bill now or treatment will stop.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your son has been admitted and the billing counter needs payment immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Please keep this confidential. Your daughter is in the hospital; send the surgery money now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your father has been admitted to the hospital. Visiting hours are at 5 PM.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital has registered your mother. Please bring the insurance card to reception.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is stable and the doctor will speak with the family during visiting hours.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital billing desk is open until the scheduled appointment; please use the official counter for any payment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child is receiving treatment. Call the hospital's published number for details.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The admission paperwork for your son is ready at reception; no payment is requested by phone.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your daughter will call after the examination. Please contact the family coordinator if needed.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The doctor has scheduled a consultation for your father tomorrow at the scheduled appointment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Please bring identification and insurance documents for your mother's hospital admission.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is safe. The hospital will provide the treatment estimate through its official portal.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child has been admitted to the hospital. Send the treatment deposit immediately for the admission bill.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "This is the hospital desk. Your son needs urgent treatment. Transfer ₹25,000 now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your daughter met with an accident and is in ICU. Pay the emergency charges within ten minutes.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The doctor has started surgery for your father. Send the money to this account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your mother's phone is unavailable after the accident. Do not call them; pay the hospital fee now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "We need an urgent deposit for your brother's treatment. Please transfer the amount before discharge.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your sister is in emergency care. Send the admission fee to this new UPI account right away.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The ambulance brought your child here. Pay the medical bill now or treatment will stop.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your son has been admitted and the billing counter needs payment immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Please keep this confidential. Your daughter is in the hospital; send the surgery money now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your father has been admitted to the hospital. Visiting hours are at 6 PM.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital has registered your mother. Please bring the insurance card to reception.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is stable and the doctor will speak with the family during visiting hours.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital billing desk is open until 5 PM; please use the official counter for any payment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child is receiving treatment. Call the hospital's published number for details.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The admission paperwork for your son is ready at reception; no payment is requested by phone.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your daughter will call after the examination. Please contact the family coordinator if needed.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The doctor has scheduled a consultation for your father tomorrow at 5 PM.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Please bring identification and insurance documents for your mother's hospital admission.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is safe. The hospital will provide the treatment estimate through its official portal.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child has been admitted to the hospital. Send ₹25,000 immediately for the admission bill.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "This is the hospital desk. Your son needs urgent treatment. Transfer ₹50,000 now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your daughter met with an accident and is in ICU. Pay the emergency charges within ten minutes.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The doctor has started surgery for your father. Send the money to this account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your mother's phone is unavailable after the accident. Do not call them; pay the hospital fee now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "We need an urgent deposit for your brother's treatment. Please transfer the amount before discharge.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your sister is in emergency care. Send the admission fee to this new UPI account right away.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The ambulance brought your child here. Pay the medical bill now or treatment will stop.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your son has been admitted and the billing counter needs payment immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Please keep this confidential. Your daughter is in the hospital; send the surgery money now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your father has been admitted to the hospital. Visiting hours are at tomorrow morning.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital has registered your mother. Please bring the insurance card to reception.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is stable and the doctor will speak with the family during visiting hours.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital billing desk is open until 6 PM; please use the official counter for any payment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child is receiving treatment. Call the hospital's published number for details.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The admission paperwork for your son is ready at reception; no payment is requested by phone.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your daughter will call after the examination. Please contact the family coordinator if needed.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The doctor has scheduled a consultation for your father tomorrow at 6 PM.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Please bring identification and insurance documents for your mother's hospital admission.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is safe. The hospital will provide the treatment estimate through its official portal.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child has been admitted to the hospital. Send ₹50,000 immediately for the admission bill.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "This is the hospital desk. Your son needs urgent treatment. Transfer the admission fee now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your daughter met with an accident and is in ICU. Pay the emergency charges within ten minutes.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The doctor has started surgery for your father. Send the money to this account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your mother's phone is unavailable after the accident. Do not call them; pay the hospital fee now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "We need an urgent deposit for your brother's treatment. Please transfer the amount before discharge.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your sister is in emergency care. Send the admission fee to this new UPI account right away.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The ambulance brought your child here. Pay the medical bill now or treatment will stop.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your son has been admitted and the billing counter needs payment immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Please keep this confidential. Your daughter is in the hospital; send the surgery money now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your father has been admitted to the hospital. Visiting hours are at the scheduled appointment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital has registered your mother. Please bring the insurance card to reception.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is stable and the doctor will speak with the family during visiting hours.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital billing desk is open until tomorrow morning; please use the official counter for any payment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child is receiving treatment. Call the hospital's published number for details.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The admission paperwork for your son is ready at reception; no payment is requested by phone.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your daughter will call after the examination. Please contact the family coordinator if needed.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The doctor has scheduled a consultation for your father tomorrow at tomorrow morning.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Please bring identification and insurance documents for your mother's hospital admission.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is safe. The hospital will provide the treatment estimate through its official portal.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child has been admitted to the hospital. Send the admission fee immediately for the admission bill.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "This is the hospital desk. Your son needs urgent treatment. Transfer the treatment deposit now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your daughter met with an accident and is in ICU. Pay the emergency charges within ten minutes.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The doctor has started surgery for your father. Send the money to this account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your mother's phone is unavailable after the accident. Do not call them; pay the hospital fee now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "We need an urgent deposit for your brother's treatment. Please transfer the amount before discharge.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your sister is in emergency care. Send the admission fee to this new UPI account right away.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The ambulance brought your child here. Pay the medical bill now or treatment will stop.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your son has been admitted and the billing counter needs payment immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Please keep this confidential. Your daughter is in the hospital; send the surgery money now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your father has been admitted to the hospital. Visiting hours are at 5 PM.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital has registered your mother. Please bring the insurance card to reception.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is stable and the doctor will speak with the family during visiting hours.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital billing desk is open until the scheduled appointment; please use the official counter for any payment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child is receiving treatment. Call the hospital's published number for details.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The admission paperwork for your son is ready at reception; no payment is requested by phone.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your daughter will call after the examination. Please contact the family coordinator if needed.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The doctor has scheduled a consultation for your father tomorrow at the scheduled appointment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Please bring identification and insurance documents for your mother's hospital admission.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is safe. The hospital will provide the treatment estimate through its official portal.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child has been admitted to the hospital. Send the treatment deposit immediately for the admission bill.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "This is the hospital desk. Your son needs urgent treatment. Transfer ₹25,000 now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your daughter met with an accident and is in ICU. Pay the emergency charges within ten minutes.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The doctor has started surgery for your father. Send the money to this account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your mother's phone is unavailable after the accident. Do not call them; pay the hospital fee now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "We need an urgent deposit for your brother's treatment. Please transfer the amount before discharge.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your sister is in emergency care. Send the admission fee to this new UPI account right away.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The ambulance brought your child here. Pay the medical bill now or treatment will stop.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your son has been admitted and the billing counter needs payment immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Please keep this confidential. Your daughter is in the hospital; send the surgery money now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your father has been admitted to the hospital. Visiting hours are at 6 PM.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital has registered your mother. Please bring the insurance card to reception.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is stable and the doctor will speak with the family during visiting hours.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital billing desk is open until 5 PM; please use the official counter for any payment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child is receiving treatment. Call the hospital's published number for details.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The admission paperwork for your son is ready at reception; no payment is requested by phone.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your daughter will call after the examination. Please contact the family coordinator if needed.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The doctor has scheduled a consultation for your father tomorrow at 5 PM.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Please bring identification and insurance documents for your mother's hospital admission.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is safe. The hospital will provide the treatment estimate through its official portal.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child has been admitted to the hospital. Send ₹25,000 immediately for the admission bill.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "This is the hospital desk. Your son needs urgent treatment. Transfer ₹50,000 now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your daughter met with an accident and is in ICU. Pay the emergency charges within ten minutes.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The doctor has started surgery for your father. Send the money to this account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your mother's phone is unavailable after the accident. Do not call them; pay the hospital fee now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "We need an urgent deposit for your brother's treatment. Please transfer the amount before discharge.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your sister is in emergency care. Send the admission fee to this new UPI account right away.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The ambulance brought your child here. Pay the medical bill now or treatment will stop.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your son has been admitted and the billing counter needs payment immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Please keep this confidential. Your daughter is in the hospital; send the surgery money now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your father has been admitted to the hospital. Visiting hours are at tomorrow morning.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital has registered your mother. Please bring the insurance card to reception.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is stable and the doctor will speak with the family during visiting hours.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital billing desk is open until 6 PM; please use the official counter for any payment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child is receiving treatment. Call the hospital's published number for details.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The admission paperwork for your son is ready at reception; no payment is requested by phone.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your daughter will call after the examination. Please contact the family coordinator if needed.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The doctor has scheduled a consultation for your father tomorrow at 6 PM.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Please bring identification and insurance documents for your mother's hospital admission.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is safe. The hospital will provide the treatment estimate through its official portal.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child has been admitted to the hospital. Send ₹50,000 immediately for the admission bill.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "This is the hospital desk. Your son needs urgent treatment. Transfer the admission fee now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your daughter met with an accident and is in ICU. Pay the emergency charges within ten minutes.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The doctor has started surgery for your father. Send the money to this account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your mother's phone is unavailable after the accident. Do not call them; pay the hospital fee now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "We need an urgent deposit for your brother's treatment. Please transfer the amount before discharge.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your sister is in emergency care. Send the admission fee to this new UPI account right away.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The ambulance brought your child here. Pay the medical bill now or treatment will stop.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your son has been admitted and the billing counter needs payment immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Please keep this confidential. Your daughter is in the hospital; send the surgery money now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your father has been admitted to the hospital. Visiting hours are at the scheduled appointment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital has registered your mother. Please bring the insurance card to reception.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is stable and the doctor will speak with the family during visiting hours.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital billing desk is open until tomorrow morning; please use the official counter for any payment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child is receiving treatment. Call the hospital's published number for details.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The admission paperwork for your son is ready at reception; no payment is requested by phone.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your daughter will call after the examination. Please contact the family coordinator if needed.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The doctor has scheduled a consultation for your father tomorrow at tomorrow morning.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Please bring identification and insurance documents for your mother's hospital admission.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is safe. The hospital will provide the treatment estimate through its official portal.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child has been admitted to the hospital. Send the admission fee immediately for the admission bill.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "This is the hospital desk. Your son needs urgent treatment. Transfer the treatment deposit now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your daughter met with an accident and is in ICU. Pay the emergency charges within ten minutes.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The doctor has started surgery for your father. Send the money to this account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your mother's phone is unavailable after the accident. Do not call them; pay the hospital fee now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "We need an urgent deposit for your brother's treatment. Please transfer the amount before discharge.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your sister is in emergency care. Send the admission fee to this new UPI account right away.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The ambulance brought your child here. Pay the medical bill now or treatment will stop.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your son has been admitted and the billing counter needs payment immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Please keep this confidential. Your daughter is in the hospital; send the surgery money now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your father has been admitted to the hospital. Visiting hours are at 5 PM.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital has registered your mother. Please bring the insurance card to reception.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is stable and the doctor will speak with the family during visiting hours.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital billing desk is open until the scheduled appointment; please use the official counter for any payment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child is receiving treatment. Call the hospital's published number for details.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The admission paperwork for your son is ready at reception; no payment is requested by phone.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your daughter will call after the examination. Please contact the family coordinator if needed.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The doctor has scheduled a consultation for your father tomorrow at the scheduled appointment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Please bring identification and insurance documents for your mother's hospital admission.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is safe. The hospital will provide the treatment estimate through its official portal.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child has been admitted to the hospital. Send the treatment deposit immediately for the admission bill.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "This is the hospital desk. Your son needs urgent treatment. Transfer ₹25,000 now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your daughter met with an accident and is in ICU. Pay the emergency charges within ten minutes.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The doctor has started surgery for your father. Send the money to this account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your mother's phone is unavailable after the accident. Do not call them; pay the hospital fee now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "We need an urgent deposit for your brother's treatment. Please transfer the amount before discharge.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your sister is in emergency care. Send the admission fee to this new UPI account right away.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The ambulance brought your child here. Pay the medical bill now or treatment will stop.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your son has been admitted and the billing counter needs payment immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Please keep this confidential. Your daughter is in the hospital; send the surgery money now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your father has been admitted to the hospital. Visiting hours are at 6 PM.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital has registered your mother. Please bring the insurance card to reception.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is stable and the doctor will speak with the family during visiting hours.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital billing desk is open until 5 PM; please use the official counter for any payment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child is receiving treatment. Call the hospital's published number for details.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The admission paperwork for your son is ready at reception; no payment is requested by phone.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your daughter will call after the examination. Please contact the family coordinator if needed.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The doctor has scheduled a consultation for your father tomorrow at 5 PM.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Please bring identification and insurance documents for your mother's hospital admission.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is safe. The hospital will provide the treatment estimate through its official portal.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child has been admitted to the hospital. Send ₹25,000 immediately for the admission bill.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "This is the hospital desk. Your son needs urgent treatment. Transfer ₹50,000 now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your daughter met with an accident and is in ICU. Pay the emergency charges within ten minutes.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The doctor has started surgery for your father. Send the money to this account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your mother's phone is unavailable after the accident. Do not call them; pay the hospital fee now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "We need an urgent deposit for your brother's treatment. Please transfer the amount before discharge.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your sister is in emergency care. Send the admission fee to this new UPI account right away.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The ambulance brought your child here. Pay the medical bill now or treatment will stop.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your son has been admitted and the billing counter needs payment immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Please keep this confidential. Your daughter is in the hospital; send the surgery money now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your father has been admitted to the hospital. Visiting hours are at tomorrow morning.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital has registered your mother. Please bring the insurance card to reception.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is stable and the doctor will speak with the family during visiting hours.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital billing desk is open until 6 PM; please use the official counter for any payment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child is receiving treatment. Call the hospital's published number for details.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The admission paperwork for your son is ready at reception; no payment is requested by phone.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your daughter will call after the examination. Please contact the family coordinator if needed.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The doctor has scheduled a consultation for your father tomorrow at 6 PM.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Please bring identification and insurance documents for your mother's hospital admission.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is safe. The hospital will provide the treatment estimate through its official portal.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child has been admitted to the hospital. Send ₹50,000 immediately for the admission bill.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "This is the hospital desk. Your son needs urgent treatment. Transfer the admission fee now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your daughter met with an accident and is in ICU. Pay the emergency charges within ten minutes.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The doctor has started surgery for your father. Send the money to this account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your mother's phone is unavailable after the accident. Do not call them; pay the hospital fee now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "We need an urgent deposit for your brother's treatment. Please transfer the amount before discharge.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your sister is in emergency care. Send the admission fee to this new UPI account right away.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The ambulance brought your child here. Pay the medical bill now or treatment will stop.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your son has been admitted and the billing counter needs payment immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Please keep this confidential. Your daughter is in the hospital; send the surgery money now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your father has been admitted to the hospital. Visiting hours are at the scheduled appointment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital has registered your mother. Please bring the insurance card to reception.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is stable and the doctor will speak with the family during visiting hours.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital billing desk is open until tomorrow morning; please use the official counter for any payment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child is receiving treatment. Call the hospital's published number for details.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The admission paperwork for your son is ready at reception; no payment is requested by phone.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your daughter will call after the examination. Please contact the family coordinator if needed.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The doctor has scheduled a consultation for your father tomorrow at tomorrow morning.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Please bring identification and insurance documents for your mother's hospital admission.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is safe. The hospital will provide the treatment estimate through its official portal.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child has been admitted to the hospital. Send the admission fee immediately for the admission bill.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "This is the hospital desk. Your son needs urgent treatment. Transfer the treatment deposit now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your daughter met with an accident and is in ICU. Pay the emergency charges within ten minutes.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The doctor has started surgery for your father. Send the money to this account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your mother's phone is unavailable after the accident. Do not call them; pay the hospital fee now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "We need an urgent deposit for your brother's treatment. Please transfer the amount before discharge.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your sister is in emergency care. Send the admission fee to this new UPI account right away.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The ambulance brought your child here. Pay the medical bill now or treatment will stop.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your son has been admitted and the billing counter needs payment immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Please keep this confidential. Your daughter is in the hospital; send the surgery money now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your father has been admitted to the hospital. Visiting hours are at 5 PM.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital has registered your mother. Please bring the insurance card to reception.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is stable and the doctor will speak with the family during visiting hours.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital billing desk is open until the scheduled appointment; please use the official counter for any payment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child is receiving treatment. Call the hospital's published number for details.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The admission paperwork for your son is ready at reception; no payment is requested by phone.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your daughter will call after the examination. Please contact the family coordinator if needed.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The doctor has scheduled a consultation for your father tomorrow at the scheduled appointment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Please bring identification and insurance documents for your mother's hospital admission.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is safe. The hospital will provide the treatment estimate through its official portal.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child has been admitted to the hospital. Send the treatment deposit immediately for the admission bill.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "This is the hospital desk. Your son needs urgent treatment. Transfer ₹25,000 now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your daughter met with an accident and is in ICU. Pay the emergency charges within ten minutes.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The doctor has started surgery for your father. Send the money to this account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your mother's phone is unavailable after the accident. Do not call them; pay the hospital fee now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "We need an urgent deposit for your brother's treatment. Please transfer the amount before discharge.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your sister is in emergency care. Send the admission fee to this new UPI account right away.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The ambulance brought your child here. Pay the medical bill now or treatment will stop.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your son has been admitted and the billing counter needs payment immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Please keep this confidential. Your daughter is in the hospital; send the surgery money now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your father has been admitted to the hospital. Visiting hours are at 6 PM.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital has registered your mother. Please bring the insurance card to reception.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is stable and the doctor will speak with the family during visiting hours.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital billing desk is open until 5 PM; please use the official counter for any payment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child is receiving treatment. Call the hospital's published number for details.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The admission paperwork for your son is ready at reception; no payment is requested by phone.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your daughter will call after the examination. Please contact the family coordinator if needed.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The doctor has scheduled a consultation for your father tomorrow at 5 PM.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Please bring identification and insurance documents for your mother's hospital admission.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is safe. The hospital will provide the treatment estimate through its official portal.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child has been admitted to the hospital. Send ₹25,000 immediately for the admission bill.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "This is the hospital desk. Your son needs urgent treatment. Transfer ₹50,000 now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your daughter met with an accident and is in ICU. Pay the emergency charges within ten minutes.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The doctor has started surgery for your father. Send the money to this account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your mother's phone is unavailable after the accident. Do not call them; pay the hospital fee now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "We need an urgent deposit for your brother's treatment. Please transfer the amount before discharge.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your sister is in emergency care. Send the admission fee to this new UPI account right away.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The ambulance brought your child here. Pay the medical bill now or treatment will stop.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your son has been admitted and the billing counter needs payment immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Please keep this confidential. Your daughter is in the hospital; send the surgery money now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your father has been admitted to the hospital. Visiting hours are at tomorrow morning.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital has registered your mother. Please bring the insurance card to reception.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is stable and the doctor will speak with the family during visiting hours.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital billing desk is open until 6 PM; please use the official counter for any payment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child is receiving treatment. Call the hospital's published number for details.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The admission paperwork for your son is ready at reception; no payment is requested by phone.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your daughter will call after the examination. Please contact the family coordinator if needed.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The doctor has scheduled a consultation for your father tomorrow at 6 PM.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Please bring identification and insurance documents for your mother's hospital admission.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is safe. The hospital will provide the treatment estimate through its official portal.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child has been admitted to the hospital. Send ₹50,000 immediately for the admission bill.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "This is the hospital desk. Your son needs urgent treatment. Transfer the admission fee now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your daughter met with an accident and is in ICU. Pay the emergency charges within ten minutes.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The doctor has started surgery for your father. Send the money to this account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your mother's phone is unavailable after the accident. Do not call them; pay the hospital fee now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "We need an urgent deposit for your brother's treatment. Please transfer the amount before discharge.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your sister is in emergency care. Send the admission fee to this new UPI account right away.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The ambulance brought your child here. Pay the medical bill now or treatment will stop.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your son has been admitted and the billing counter needs payment immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Please keep this confidential. Your daughter is in the hospital; send the surgery money now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your father has been admitted to the hospital. Visiting hours are at the scheduled appointment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital has registered your mother. Please bring the insurance card to reception.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is stable and the doctor will speak with the family during visiting hours.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital billing desk is open until tomorrow morning; please use the official counter for any payment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child is receiving treatment. Call the hospital's published number for details.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The admission paperwork for your son is ready at reception; no payment is requested by phone.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your daughter will call after the examination. Please contact the family coordinator if needed.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The doctor has scheduled a consultation for your father tomorrow at tomorrow morning.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Please bring identification and insurance documents for your mother's hospital admission.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is safe. The hospital will provide the treatment estimate through its official portal.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child has been admitted to the hospital. Send the admission fee immediately for the admission bill.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "This is the hospital desk. Your son needs urgent treatment. Transfer the treatment deposit now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your daughter met with an accident and is in ICU. Pay the emergency charges within ten minutes.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The doctor has started surgery for your father. Send the money to this account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your mother's phone is unavailable after the accident. Do not call them; pay the hospital fee now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "We need an urgent deposit for your brother's treatment. Please transfer the amount before discharge.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your sister is in emergency care. Send the admission fee to this new UPI account right away.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The ambulance brought your child here. Pay the medical bill now or treatment will stop.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your son has been admitted and the billing counter needs payment immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Please keep this confidential. Your daughter is in the hospital; send the surgery money now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your father has been admitted to the hospital. Visiting hours are at 5 PM.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital has registered your mother. Please bring the insurance card to reception.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is stable and the doctor will speak with the family during visiting hours.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital billing desk is open until the scheduled appointment; please use the official counter for any payment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child is receiving treatment. Call the hospital's published number for details.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The admission paperwork for your son is ready at reception; no payment is requested by phone.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your daughter will call after the examination. Please contact the family coordinator if needed.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The doctor has scheduled a consultation for your father tomorrow at the scheduled appointment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Please bring identification and insurance documents for your mother's hospital admission.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is safe. The hospital will provide the treatment estimate through its official portal.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child has been admitted to the hospital. Send the treatment deposit immediately for the admission bill.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "This is the hospital desk. Your son needs urgent treatment. Transfer ₹25,000 now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your daughter met with an accident and is in ICU. Pay the emergency charges within ten minutes.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The doctor has started surgery for your father. Send the money to this account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your mother's phone is unavailable after the accident. Do not call them; pay the hospital fee now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "We need an urgent deposit for your brother's treatment. Please transfer the amount before discharge.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your sister is in emergency care. Send the admission fee to this new UPI account right away.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "The ambulance brought your child here. Pay the medical bill now or treatment will stop.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your son has been admitted and the billing counter needs payment immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Please keep this confidential. Your daughter is in the hospital; send the surgery money now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "family_emergency_payment_scam"
+  },
+  {
+    "text": "Your father has been admitted to the hospital. Visiting hours are at 6 PM.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital has registered your mother. Please bring the insurance card to reception.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is stable and the doctor will speak with the family during visiting hours.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The hospital billing desk is open until 5 PM; please use the official counter for any payment.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your child is receiving treatment. Call the hospital's published number for details.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The admission paperwork for your son is ready at reception; no payment is requested by phone.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your daughter will call after the examination. Please contact the family coordinator if needed.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "The doctor has scheduled a consultation for your father tomorrow at 5 PM.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Please bring identification and insurance documents for your mother's hospital admission.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "Your brother is safe. The hospital will provide the treatment estimate through its official portal.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_emergency_payment",
+    "category": "normal_hospital_or_family_message"
+  },
+  {
+    "text": "તમારા નામ પર ધરપકડ વોરંટ નીકળ્યું છે, સીબીઆઈ અધિકારી બોલું છું, પૈસા સુરક્ષિત ખાતામાં મોકલો",
+    "label": 1,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "તમારા નામ પર ધરપકડ વોરંટ નીકળ્યું છે, સીબીઆઈ અધિકારી બોલું છું, પૈસા સુરક્ષિત ખાતામાં મોકલો",
+    "label": 1,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "તમારા નામ પર ધરપકડ વોરંટ નીકળ્યું છે, સીબીઆઈ અધિકારી બોલું છું, પૈસા સુરક્ષિત ખાતામાં મોકલો",
+    "label": 1,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "તમારા નામ પર ધરપકડ વોરંટ નીકળ્યું છે, સીબીઆઈ અધિકારી બોલું છું, પૈસા સુરક્ષિત ખાતામાં મોકલો",
+    "label": 1,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "તમારા નામ પર ધરપકડ વોરંટ નીકળ્યું છે, સીબીઆઈ અધિકારી બોલું છું, પૈસા સુરક્ષિત ખાતામાં મોકલો",
+    "label": 1,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "તમારા નામ પર ધરપકડ વોરંટ નીકળ્યું છે, સીબીઆઈ અધિકારી બોલું છું, પૈસા સુરક્ષિત ખાતામાં મોકલો",
+    "label": 1,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "તમારા નામ પર ધરપકડ વોરંટ નીકળ્યું છે, સીબીઆઈ અધિકારી બોલું છું, પૈસા સુરક્ષિત ખાતામાં મોકલો",
+    "label": 1,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "તમારા નામ પર ધરપકડ વોરંટ નીકળ્યું છે, સીબીઆઈ અધિકારી બોલું છું, પૈસા સુરક્ષિત ખાતામાં મોકલો",
+    "label": 1,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "તમારા ખાતામાં શંકાસ્પદ વ્યવહાર થયો છે, તરત જ સુરક્ષિત ખાતામાં પૈસા મોકલો",
+    "label": 1,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "તમારા ખાતામાં શંકાસ્પદ વ્યવહાર થયો છે, તરત જ સુરક્ષિત ખાતામાં પૈસા મોકલો",
+    "label": 1,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "તમારા ખાતામાં શંકાસ્પદ વ્યવહાર થયો છે, તરત જ સુરક્ષિત ખાતામાં પૈસા મોકલો",
+    "label": 1,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "તમારા ખાતામાં શંકાસ્પદ વ્યવહાર થયો છે, તરત જ સુરક્ષિત ખાતામાં પૈસા મોકલો",
+    "label": 1,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "તમારા ખાતામાં શંકાસ્પદ વ્યવહાર થયો છે, તરત જ સુરક્ષિત ખાતામાં પૈસા મોકલો",
+    "label": 1,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "તમારા ખાતામાં શંકાસ્પદ વ્યવહાર થયો છે, તરત જ સુરક્ષિત ખાતામાં પૈસા મોકલો",
+    "label": 1,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "તમારા ખાતામાં શંકાસ્પદ વ્યવહાર થયો છે, તરત જ સુરક્ષિત ખાતામાં પૈસા મોકલો",
+    "label": 1,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "તમારા ખાતામાં શંકાસ્પદ વ્યવહાર થયો છે, તરત જ સુરક્ષિત ખાતામાં પૈસા મોકલો",
+    "label": 1,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "તમારા નામે ધરપકડ વોરંટ છે, પોલીસ અધિકારી બોલું છું, હમણાં પૈસા ટ્રાન્સફર કરો",
+    "label": 1,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "તમારા નામે ધરપકડ વોરંટ છે, પોલીસ અધિકારી બોલું છું, હમણાં પૈસા ટ્રાન્સફર કરો",
+    "label": 1,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "તમારા નામે ધરપકડ વોરંટ છે, પોલીસ અધિકારી બોલું છું, હમણાં પૈસા ટ્રાન્સફર કરો",
+    "label": 1,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "તમારા નામે ધરપકડ વોરંટ છે, પોલીસ અધિકારી બોલું છું, હમણાં પૈસા ટ્રાન્સફર કરો",
+    "label": 1,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "તમારા નામે ધરપકડ વોરંટ છે, પોલીસ અધિકારી બોલું છું, હમણાં પૈસા ટ્રાન્સફર કરો",
+    "label": 1,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "તમારા નામે ધરપકડ વોરંટ છે, પોલીસ અધિકારી બોલું છું, હમણાં પૈસા ટ્રાન્સફર કરો",
+    "label": 1,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "તમારા નામે ધરપકડ વોરંટ છે, પોલીસ અધિકારી બોલું છું, હમણાં પૈસા ટ્રાન્સફર કરો",
+    "label": 1,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "તમારા નામે ધરપકડ વોરંટ છે, પોલીસ અધિકારી બોલું છું, હમણાં પૈસા ટ્રાન્સફર કરો",
+    "label": 1,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "आपके नाम पर गिरफ्तारी वारंट है, सीबीआई अधिकारी बोल रहा हूं, पैसे सुरक्षित खाते में भेजें",
+    "label": 1,
+    "language": "hi",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "आपके नाम पर गिरफ्तारी वारंट है, सीबीआई अधिकारी बोल रहा हूं, पैसे सुरक्षित खाते में भेजें",
+    "label": 1,
+    "language": "hi",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "आपके नाम पर गिरफ्तारी वारंट है, सीबीआई अधिकारी बोल रहा हूं, पैसे सुरक्षित खाते में भेजें",
+    "label": 1,
+    "language": "hi",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "आपके नाम पर गिरफ्तारी वारंट है, सीबीआई अधिकारी बोल रहा हूं, पैसे सुरक्षित खाते में भेजें",
+    "label": 1,
+    "language": "hi",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "आपके नाम पर गिरफ्तारी वारंट है, सीबीआई अधिकारी बोल रहा हूं, पैसे सुरक्षित खाते में भेजें",
+    "label": 1,
+    "language": "hi",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "आपके नाम पर गिरफ्तारी वारंट है, सीबीआई अधिकारी बोल रहा हूं, पैसे सुरक्षित खाते में भेजें",
+    "label": 1,
+    "language": "hi",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "आपके नाम पर गिरफ्तारी वारंट है, सीबीआई अधिकारी बोल रहा हूं, पैसे सुरक्षित खाते में भेजें",
+    "label": 1,
+    "language": "hi",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "आपके नाम पर गिरफ्तारी वारंट है, सीबीआई अधिकारी बोल रहा हूं, पैसे सुरक्षित खाते में भेजें",
+    "label": 1,
+    "language": "hi",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "आपका बच्चा अस्पताल में है, तुरंत पैसे भेजिए और किसी को मत बताइए",
+    "label": 1,
+    "language": "hi",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "आपका बच्चा अस्पताल में है, तुरंत पैसे भेजिए और किसी को मत बताइए",
+    "label": 1,
+    "language": "hi",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "आपका बच्चा अस्पताल में है, तुरंत पैसे भेजिए और किसी को मत बताइए",
+    "label": 1,
+    "language": "hi",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "आपका बच्चा अस्पताल में है, तुरंत पैसे भेजिए और किसी को मत बताइए",
+    "label": 1,
+    "language": "hi",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "आपका बच्चा अस्पताल में है, तुरंत पैसे भेजिए और किसी को मत बताइए",
+    "label": 1,
+    "language": "hi",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "आपका बच्चा अस्पताल में है, तुरंत पैसे भेजिए और किसी को मत बताइए",
+    "label": 1,
+    "language": "hi",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "आपका बच्चा अस्पताल में है, तुरंत पैसे भेजिए और किसी को मत बताइए",
+    "label": 1,
+    "language": "hi",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "आपका बच्चा अस्पताल में है, तुरंत पैसे भेजिए और किसी को मत बताइए",
+    "label": 1,
+    "language": "hi",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "I am Inspector Sharma from CBI headquarters. Transfer funds to the safe custody account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "I am Inspector Sharma from CBI headquarters. Transfer funds to the safe custody account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "I am Inspector Sharma from CBI headquarters. Transfer funds to the safe custody account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "I am Inspector Sharma from CBI headquarters. Transfer funds to the safe custody account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "I am Inspector Sharma from CBI headquarters. Transfer funds to the safe custody account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "I am Inspector Sharma from CBI headquarters. Transfer funds to the safe custody account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "I am Inspector Sharma from CBI headquarters. Transfer funds to the safe custody account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "I am Inspector Sharma from CBI headquarters. Transfer funds to the safe custody account immediately.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "Your account will be frozen unless you transfer money to the verification account now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "Your account will be frozen unless you transfer money to the verification account now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "Your account will be frozen unless you transfer money to the verification account now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "Your account will be frozen unless you transfer money to the verification account now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "Your account will be frozen unless you transfer money to the verification account now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "Your account will be frozen unless you transfer money to the verification account now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "Your account will be frozen unless you transfer money to the verification account now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "Your account will be frozen unless you transfer money to the verification account now.",
+    "label": 1,
+    "language": "en",
+    "source": "satark_multilingual_regression",
+    "category": "regression_scam"
+  },
+  {
+    "text": "તમારા કાકા હોસ્પિટલમાં દાખલ છે, મુલાકાતનો સમય સાંજે પાંચ વાગ્યે છે.",
+    "label": 0,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_benign"
+  },
+  {
+    "text": "તમારા કાકા હોસ્પિટલમાં દાખલ છે, મુલાકાતનો સમય સાંજે પાંચ વાગ્યે છે.",
+    "label": 0,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_benign"
+  },
+  {
+    "text": "તમારા કાકા હોસ્પિટલમાં દાખલ છે, મુલાકાતનો સમય સાંજે પાંચ વાગ્યે છે.",
+    "label": 0,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_benign"
+  },
+  {
+    "text": "તમારા કાકા હોસ્પિટલમાં દાખલ છે, મુલાકાતનો સમય સાંજે પાંચ વાગ્યે છે.",
+    "label": 0,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_benign"
+  },
+  {
+    "text": "તમારા કાકા હોસ્પિટલમાં દાખલ છે, મુલાકાતનો સમય સાંજે પાંચ વાગ્યે છે.",
+    "label": 0,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_benign"
+  },
+  {
+    "text": "તમારા કાકા હોસ્પિટલમાં દાખલ છે, મુલાકાતનો સમય સાંજે પાંચ વાગ્યે છે.",
+    "label": 0,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_benign"
+  },
+  {
+    "text": "તમારા કાકા હોસ્પિટલમાં દાખલ છે, મુલાકાતનો સમય સાંજે પાંચ વાગ્યે છે.",
+    "label": 0,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_benign"
+  },
+  {
+    "text": "તમારા કાકા હોસ્પિટલમાં દાખલ છે, મુલાકાતનો સમય સાંજે પાંચ વાગ્યે છે.",
+    "label": 0,
+    "language": "gu",
+    "source": "satark_multilingual_regression",
+    "category": "regression_benign"
+  },
+  {
+    "text": "आपका बच्चा अस्पताल में सुरक्षित है, कृपया आधिकारिक रिसेप्शन से जानकारी लें।",
+    "label": 0,
+    "language": "hi",
+    "source": "satark_multilingual_regression",
+    "category": "regression_benign"
+  },
+  {
+    "text": "आपका बच्चा अस्पताल में सुरक्षित है, कृपया आधिकारिक रिसेप्शन से जानकारी लें।",
+    "label": 0,
+    "language": "hi",
+    "source": "satark_multilingual_regression",
+    "category": "regression_benign"
+  },
+  {
+    "text": "आपका बच्चा अस्पताल में सुरक्षित है, कृपया आधिकारिक रिसेप्शन से जानकारी लें।",
+    "label": 0,
+    "language": "hi",
+    "source": "satark_multilingual_regression",
+    "category": "regression_benign"
+  },
+  {
+    "text": "आपका बच्चा अस्पताल में सुरक्षित है, कृपया आधिकारिक रिसेप्शन से जानकारी लें।",
+    "label": 0,
+    "language": "hi",
+    "source": "satark_multilingual_regression",
+    "category": "regression_benign"
+  },
+  {
+    "text": "आपका बच्चा अस्पताल में सुरक्षित है, कृपया आधिकारिक रिसेप्शन से जानकारी लें।",
+    "label": 0,
+    "language": "hi",
+    "source": "satark_multilingual_regression",
+    "category": "regression_benign"
+  },
+  {
+    "text": "आपका बच्चा अस्पताल में सुरक्षित है, कृपया आधिकारिक रिसेप्शन से जानकारी लें।",
+    "label": 0,
+    "language": "hi",
+    "source": "satark_multilingual_regression",
+    "category": "regression_benign"
+  },
+  {
+    "text": "आपका बच्चा अस्पताल में सुरक्षित है, कृपया आधिकारिक रिसेप्शन से जानकारी लें।",
+    "label": 0,
+    "language": "hi",
+    "source": "satark_multilingual_regression",
+    "category": "regression_benign"
+  },
+  {
+    "text": "आपका बच्चा अस्पताल में सुरक्षित है, कृपया आधिकारिक रिसेप्शन से जानकारी लें।",
+    "label": 0,
+    "language": "hi",
+    "source": "satark_multilingual_regression",
+    "category": "regression_benign"
+  },
+  {
+    "text": "Your child is stable. Please contact the hospital using its official number.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_multilingual_regression",
+    "category": "regression_benign"
+  },
+  {
+    "text": "Your child is stable. Please contact the hospital using its official number.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_multilingual_regression",
+    "category": "regression_benign"
+  },
+  {
+    "text": "Your child is stable. Please contact the hospital using its official number.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_multilingual_regression",
+    "category": "regression_benign"
+  },
+  {
+    "text": "Your child is stable. Please contact the hospital using its official number.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_multilingual_regression",
+    "category": "regression_benign"
+  },
+  {
+    "text": "Your child is stable. Please contact the hospital using its official number.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_multilingual_regression",
+    "category": "regression_benign"
+  },
+  {
+    "text": "Your child is stable. Please contact the hospital using its official number.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_multilingual_regression",
+    "category": "regression_benign"
+  },
+  {
+    "text": "Your child is stable. Please contact the hospital using its official number.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_multilingual_regression",
+    "category": "regression_benign"
+  },
+  {
+    "text": "Your child is stable. Please contact the hospital using its official number.",
+    "label": 0,
+    "language": "en",
+    "source": "satark_multilingual_regression",
+    "category": "regression_benign"
+  }
+]

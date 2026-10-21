@@ -14,9 +14,9 @@ import sys
 import json
 import time
 import requests
+import torch
 import pandas as pd
 import numpy as np
-import torch
 from torch.utils.data import Dataset, DataLoader
 from transformers import (
     AutoTokenizer,
@@ -35,6 +35,93 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SAVED_MODEL_DIR = os.path.join(BASE_DIR, "saved_model")
 METRICS_FILE = os.path.join(BASE_DIR, "benchmark_metrics.json")
 COMPOSITE_DATA_FILE = os.path.join(BASE_DIR, "hf_composite_dataset.json")
+EMERGENCY_DATA_FILE = os.path.join(BASE_DIR, "emergency_payment_dataset.json")
+
+
+def build_emergency_payment_dataset():
+    """Create balanced examples for family-emergency payment impersonation."""
+    scam_templates = [
+        "Your {relative} has been admitted to the hospital. Send {amount} immediately for the admission bill.",
+        "This is the hospital desk. Your {relative} needs urgent treatment. Transfer {amount} now.",
+        "Your {relative} met with an accident and is in ICU. Pay the emergency charges within ten minutes.",
+        "The doctor has started surgery for your {relative}. Send the money to this account immediately.",
+        "Your {relative}'s phone is unavailable after the accident. Do not call them; pay the hospital fee now.",
+        "We need an urgent deposit for your {relative}'s treatment. Please transfer the amount before discharge.",
+        "Your {relative} is in emergency care. Send the admission fee to this new UPI account right away.",
+        "The ambulance brought your {relative} here. Pay the medical bill now or treatment will stop.",
+        "Your {relative} has been admitted and the billing counter needs payment immediately.",
+        "Please keep this confidential. Your {relative} is in the hospital; send the surgery money now.",
+    ]
+    legitimate_templates = [
+        "Your {relative} has been admitted to the hospital. Visiting hours are at {time}.",
+        "The hospital has registered your {relative}. Please bring the insurance card to reception.",
+        "Your {relative} is stable and the doctor will speak with the family during visiting hours.",
+        "The hospital billing desk is open until {time}; please use the official counter for any payment.",
+        "Your {relative} is receiving treatment. Call the hospital's published number for details.",
+        "The admission paperwork for your {relative} is ready at reception; no payment is requested by phone.",
+        "Your {relative} will call after the examination. Please contact the family coordinator if needed.",
+        "The doctor has scheduled a consultation for your {relative} tomorrow at {time}.",
+        "Please bring identification and insurance documents for your {relative}'s hospital admission.",
+        "Your {relative} is safe. The hospital will provide the treatment estimate through its official portal.",
+    ]
+    relatives = ["child", "son", "daughter", "father", "mother", "brother", "sister"]
+    amounts = ["₹25,000", "₹50,000", "the admission fee", "the treatment deposit"]
+    times = ["5 PM", "6 PM", "tomorrow morning", "the scheduled appointment"]
+    records = []
+    for index in range(20):
+        for template in scam_templates:
+            records.append({
+                "text": template.format(
+                    relative=relatives[(index + len(records)) % len(relatives)],
+                    amount=amounts[(index + len(records)) % len(amounts)]
+                ),
+                "label": 1,
+                "language": "en",
+                "source": "satark_emergency_payment",
+                "category": "family_emergency_payment_scam"
+            })
+        for template in legitimate_templates:
+            records.append({
+                "text": template.format(
+                    relative=relatives[(index + len(records)) % len(relatives)],
+                    time=times[(index + len(records)) % len(times)]
+                ),
+                "label": 0,
+                "language": "en",
+                "source": "satark_emergency_payment",
+                "category": "normal_hospital_or_family_message"
+            })
+    multilingual_regression_examples = [
+        ("તમારા નામ પર ધરપકડ વોરંટ નીકળ્યું છે, સીબીઆઈ અધિકારી બોલું છું, પૈસા સુરક્ષિત ખાતામાં મોકલો", 1, "gu"),
+        ("તમારા ખાતામાં શંકાસ્પદ વ્યવહાર થયો છે, તરત જ સુરક્ષિત ખાતામાં પૈસા મોકલો", 1, "gu"),
+        ("તમારા નામે ધરપકડ વોરંટ છે, પોલીસ અધિકારી બોલું છું, હમણાં પૈસા ટ્રાન્સફર કરો", 1, "gu"),
+        ("आपके नाम पर गिरफ्तारी वारंट है, सीबीआई अधिकारी बोल रहा हूं, पैसे सुरक्षित खाते में भेजें", 1, "hi"),
+        ("आपका बच्चा अस्पताल में है, तुरंत पैसे भेजिए और किसी को मत बताइए", 1, "hi"),
+        ("I am Inspector Sharma from CBI headquarters. Transfer funds to the safe custody account immediately.", 1, "en"),
+        ("Your account will be frozen unless you transfer money to the verification account now.", 1, "en"),
+        ("તમારા કાકા હોસ્પિટલમાં દાખલ છે, મુલાકાતનો સમય સાંજે પાંચ વાગ્યે છે.", 0, "gu"),
+        ("आपका बच्चा अस्पताल में सुरक्षित है, कृपया आधिकारिक रिसेप्शन से जानकारी लें।", 0, "hi"),
+        ("Your child is stable. Please contact the hospital using its official number.", 0, "en"),
+    ]
+    for text, label, language in multilingual_regression_examples:
+        records.extend([
+            {
+                "text": text,
+                "label": label,
+                "language": language,
+                "source": "satark_multilingual_regression",
+                "category": "regression_scam" if label else "regression_benign"
+            }
+        ] * 8)
+    return records
+
+
+def load_emergency_payment_dataset():
+    records = build_emergency_payment_dataset()
+    with open(EMERGENCY_DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump(records, f, ensure_ascii=False, indent=2)
+    print(f"Emergency-payment dataset: {len(records)} balanced records")
+    return records
 
 def load_and_prepare_hf_datasets(max_samples_14lang=2000, max_samples_icfd=1000):
     """
@@ -155,6 +242,11 @@ def fine_tune_on_hf_datasets(epochs=2, batch_size=16):
             records = json.load(f)
     else:
         records = load_and_prepare_hf_datasets()
+
+    emergency_records = load_emergency_payment_dataset()
+    records = records + emergency_records
+    if len(records) == 0 or len({r["label"] for r in records}) < 2:
+        raise ValueError("Training data must contain non-empty benign and scam classes")
 
     texts = [r["text"] for r in records]
     labels = [r["label"] for r in records]

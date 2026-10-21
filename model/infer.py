@@ -14,28 +14,31 @@ if sys.platform == "win32":
     except Exception:
         pass
 
+_tokenizer = None
+_model = None
+_device = None
+
 def predict_chunk(text, model_dir="model/saved_model"):
+    global _tokenizer, _model, _device
     base_dir = os.path.dirname(os.path.abspath(__file__))
     saved_model_path = os.path.join(base_dir, "saved_model")
     
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    if _model is None:
+        _device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        if os.path.exists(saved_model_path):
+            _tokenizer = AutoTokenizer.from_pretrained(saved_model_path)
+            _model = AutoModelForSequenceClassification.from_pretrained(saved_model_path)
+        else:
+            print("Notice: Using pretrained base multilingual architecture...")
+            model_name = "distilbert-base-multilingual-cased"
+            _tokenizer = AutoTokenizer.from_pretrained(model_name)
+            _model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=2)
+        _model.to(_device)
+        _model.eval()
 
-    if os.path.exists(saved_model_path):
-        tokenizer = AutoTokenizer.from_pretrained(saved_model_path)
-        model = AutoModelForSequenceClassification.from_pretrained(saved_model_path)
-    else:
-        # Fallback to base model if fine-tuned checkpoint not generated yet
-        print("Notice: Using pretrained base multilingual architecture...")
-        model_name = "distilbert-base-multilingual-cased"
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=2)
-
-    model.to(device)
-    model.eval()
-
-    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=128).to(device)
+    inputs = _tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=128).to(_device)
     with torch.no_grad():
-        outputs = model(**inputs)
+        outputs = _model(**inputs)
         probs = torch.softmax(outputs.logits, dim=1).cpu().numpy()[0]
 
     scam_prob = float(probs[1])
