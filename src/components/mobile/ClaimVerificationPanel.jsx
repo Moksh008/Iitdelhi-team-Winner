@@ -11,14 +11,14 @@ import {
 } from 'lucide-react';
 import { INDIAN_LANGUAGES } from '../../engine/languages';
 
-export default function ClaimVerificationPanel({ result, isOpen = true, onClose }) {
+export default function ClaimVerificationPanel({ result, isOpen = true, onClose, apiBaseUrl: propApiBaseUrl }) {
   const [nearbyPlaces, setNearbyPlaces] = useState([]);
   const [nearbyNotice, setNearbyNotice] = useState('');
   const [resolvedLocation, setResolvedLocation] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [activeCategory, setActiveCategory] = useState('hospital');
   const [resultLimit, setResultLimit] = useState(3);
-  const apiBaseUrl = import.meta.env.VITE_SATARK_API_BASE_URL || '';
+  const apiBaseUrl = propApiBaseUrl || import.meta.env.VITE_SATARK_API_BASE_URL || (window.Capacitor?.isNativePlatform?.() ? 'http://10.0.2.2:8000' : 'http://127.0.0.1:8000');
   const [searchError, setSearchError] = useState('');
 
   const entities = result?.entities || [];
@@ -57,6 +57,7 @@ export default function ClaimVerificationPanel({ result, isOpen = true, onClose 
     setSearchError('');
     setNearbyPlaces([]);
     const endpoint = `${apiBaseUrl.replace(/\/$/, '')}/api/v1/places/search`;
+    console.info('[SATARK diagnostic] Executing POST places search:', endpoint);
     const controller = new AbortController();
     const timeoutId = window.setTimeout(() => controller.abort(), 10000);
     fetch(endpoint, {
@@ -66,6 +67,7 @@ export default function ClaimVerificationPanel({ result, isOpen = true, onClose 
       signal: controller.signal
     })
       .then(async response => {
+        console.info('[SATARK diagnostic] Places search response status:', response.status);
         const body = await response.json().catch(() => null);
         if (!response.ok) {
           throw new Error(body?.detail || `Places search failed (HTTP ${response.status})`);
@@ -79,6 +81,7 @@ export default function ClaimVerificationPanel({ result, isOpen = true, onClose 
       })
       .catch(error => {
         if (error.name === 'AbortError') return;
+        console.warn('[SATARK diagnostic] Places search failed for URL:', endpoint, 'Reason:', error.message);
         setNearbyPlaces([]);
         setSearchError(error.message || 'Nearby search failed. Try again or verify through an official source.');
       })

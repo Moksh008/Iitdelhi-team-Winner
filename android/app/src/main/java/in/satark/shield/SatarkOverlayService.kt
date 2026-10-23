@@ -8,6 +8,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo
 import android.graphics.PixelFormat
 import android.net.Uri
 import android.os.Build
@@ -18,11 +19,15 @@ import android.provider.Settings
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
+import android.util.Log
 import android.view.Gravity
 import android.view.WindowManager
+import androidx.core.content.ContextCompat
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,7 +39,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -54,15 +61,50 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.setViewTreeLifecycleOwner
+import androidx.lifecycle.setViewTreeViewModelStoreOwner
+import androidx.savedstate.SavedStateRegistry
+import androidx.savedstate.SavedStateRegistryController
+import androidx.savedstate.SavedStateRegistryOwner
+import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import org.json.JSONException
 import org.json.JSONObject
+import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
-import java.io.IOException
-import org.json.JSONException
 import java.util.Locale
 import java.util.concurrent.Executors
+
+class SatarkLifecycleOwner : LifecycleOwner, SavedStateRegistryOwner, ViewModelStoreOwner {
+    private val lifecycleRegistry = LifecycleRegistry(this)
+    private val savedStateRegistryController = SavedStateRegistryController.create(this)
+    private val store = ViewModelStore()
+
+    init {
+        savedStateRegistryController.performRestore(null)
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    }
+
+    override val lifecycle: Lifecycle get() = lifecycleRegistry
+    override val savedStateRegistry: SavedStateRegistry get() = savedStateRegistryController.savedStateRegistry
+    override val viewModelStore: ViewModelStore get() = store
+
+    fun destroy() {
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+        store.clear()
+    }
+}
 
 class SatarkOverlayService : Service() {
     companion object {
@@ -73,7 +115,7 @@ class SatarkOverlayService : Service() {
         const val EXTRA_AUTO_LANGUAGE_DETECTION = "auto_language_detection"
         private const val CHANNEL_ID = "satark_overlay"
         private const val NOTIFICATION_ID = 4242
-        private val API_BASE_URL = BuildConfig.SATARK_API_BASE_URL.trimEnd('/')
+        private val API_BASE_URL = (if (BuildConfig.SATARK_API_BASE_URL.isNotBlank()) BuildConfig.SATARK_API_BASE_URL else "https://satark-backend-sf2b.onrender.com").trimEnd('/')
     }
 
     private data class Place(
@@ -98,11 +140,12 @@ class SatarkOverlayService : Service() {
     private lateinit var windowManager: WindowManager
     private var bubbleView: ComposeView? = null
     private var bubbleParams: WindowManager.LayoutParams? = null
+    private var lifecycleOwner: SatarkLifecycleOwner? = null
     private var recognizer: SpeechRecognizer? = null
     private val executor = Executors.newSingleThreadExecutor()
     private var sensing by mutableStateOf(false)
     private var expanded by mutableStateOf(false)
-    private var status by mutableStateOf("Stopped")
+    private var status by mutableStateOf("Sensing Paused")
     private var warning by mutableStateOf<Warning?>(null)
     private var sessionId: String? = null
     private var transcriptBuffer = ""
@@ -118,8 +161,47 @@ class SatarkOverlayService : Service() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
-        startForeground(NOTIFICATION_ID, buildNotification())
+        promoteToForeground()
         if (Settings.canDrawOverlays(this)) showOverlay()
+    }
+
+    private fun promoteToForeground() {
+        val hasMicPermission = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.RECORD_AUDIO
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val serviceType = if (hasMicPermission) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE or ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+                } else {
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+                }
+            } else {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+                } else {
+                    0
+                }
+            }
+            try {
+                startForeground(NOTIFICATION_ID, buildNotification(), serviceType)
+            } catch (e: Exception) {
+                Log.w("SatarkOverlayService", "Failed to startForeground with type $serviceType, trying fallback", e)
+                try {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        startForeground(NOTIFICATION_ID, buildNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+                    } else {
+                        startForeground(NOTIFICATION_ID, buildNotification())
+                    }
+                } catch (e2: Exception) {
+                    Log.e("SatarkOverlayService", "Fallback startForeground failed", e2)
+                }
+            }
+        } else {
+            startForeground(NOTIFICATION_ID, buildNotification())
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -155,7 +237,7 @@ class SatarkOverlayService : Service() {
             return
         }
         if (!SpeechRecognizer.isRecognitionAvailable(this)) {
-            status = "Input Unavailable: speech recognition is not available"
+            status = "Speech recognition service unavailable on device"
             sensing = false
             expanded = true
             render()
@@ -167,7 +249,7 @@ class SatarkOverlayService : Service() {
         transcriptBuffer = ""
         sequence = 0
         recognitionRetryCount = 0
-        status = "Microphone sensing active; remote call audio is unavailable"
+        status = "Microphone active (Call Audio Unavailable)"
         expanded = false
         updateSensingNotification()
         recognizer?.destroy()
@@ -178,13 +260,13 @@ class SatarkOverlayService : Service() {
                     val text = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                         ?.firstOrNull().orEmpty()
                     if (text.isBlank()) {
-                        status = "Waiting for Input"
+                        status = "Listening for speech..."
                         render()
                     } else {
                         transcriptBuffer = listOf(transcriptBuffer, text)
                             .filter { it.isNotBlank() }
                             .joinToString("\n")
-                        status = "Analyzing"
+                        status = "Analyzing transcript..."
                         render()
                         val language = if (autoDetectLanguage) {
                             currentDetectedLanguage ?: "auto"
@@ -203,7 +285,7 @@ class SatarkOverlayService : Service() {
 
                 override fun onReadyForSpeech(params: android.os.Bundle?) {
                     if (sensing) {
-                        status = "Microphone active; remote call audio is unavailable"
+                        status = "Microphone active (Call Audio Unavailable)"
                         render()
                     }
                 }
@@ -223,7 +305,7 @@ class SatarkOverlayService : Service() {
                         && confidence >= SpeechRecognizer.LANGUAGE_DETECTION_CONFIDENCE_LEVEL_CONFIDENT
                     ) {
                         currentDetectedLanguage = Locale.forLanguageTag(tag).language
-                        status = "Detected ${Locale.forLanguageTag(tag).getDisplayLanguage(Locale.getDefault())}; analyzing transcript"
+                        status = "Detected ${Locale.forLanguageTag(tag).getDisplayLanguage(Locale.getDefault())}; analyzing"
                         render()
                     }
                 }
@@ -272,7 +354,7 @@ class SatarkOverlayService : Service() {
         if (!sensing || recognizer !== speech) return
         if (error == SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS || recognitionRetryCount >= 3) {
             sensing = false
-            status = "Microphone recognition unavailable; use manual transcript input"
+            status = "Microphone speech input paused (Use Manual Fallback)"
             recognitionRetry?.let(mainHandler::removeCallbacks)
             recognitionRetry = null
             speech.cancel()
@@ -285,7 +367,7 @@ class SatarkOverlayService : Service() {
 
         recognitionRetryCount++
         val delayMs = 1000L * recognitionRetryCount
-        status = "Microphone input interrupted; retrying. Remote call audio is unavailable."
+        status = "Microphone retrying... (Call Audio Unavailable)"
         recognitionRetry?.let(mainHandler::removeCallbacks)
         recognitionRetry = Runnable {
             recognitionRetry = null
@@ -300,7 +382,7 @@ class SatarkOverlayService : Service() {
         executor.execute {
             try {
                 val response = postJson(
-                    "$API_BASE_URL/api/v1/analyze-text",
+                    "$API_BASE_URL/api/v1/analyze-transcript",
                     JSONObject()
                         .put("session_id", sessionId)
                         .put("sequence", sequence++)
@@ -309,26 +391,26 @@ class SatarkOverlayService : Service() {
                         .put("is_final", true)
                 )
                 val result = JSONObject(response)
-                val score = result.optDouble("scam_probability", 0.0)
+                val score = result.optDouble("scam_probability", result.optDouble("score", 0.0))
                 val tier = result.optInt("action_tier", 0)
                 val entities = result.optJSONArray("entities")
-                val location = entities?.let { array ->
+                val location = result.optString("extracted_location").takeIf { !it.isNullOrBlank() } ?: entities?.let { array ->
                     (0 until array.length())
                         .map { array.optJSONObject(it) }
                         .firstOrNull {
                             it?.optString("type") == "LOCATION" ||
-                                it.optString("type") == "HOSPITAL"
+                                it?.optString("type") == "HOSPITAL"
                         }
                         ?.optString("normalized_text")
                 }
-                if (tier > 0 || score >= 0.65) {
+                if (tier > 0 || score >= 0.60) {
                     val category = result.optString("place_category", "hospital")
                     val places = if (!location.isNullOrBlank()) searchPlaces(location, category) else emptyList()
                     postToMain {
                         warning = Warning(
                             level = when {
                                 tier >= 2 || score >= 0.8 -> "High"
-                                tier == 1 || score >= 0.65 -> "Caution"
+                                tier == 1 || score >= 0.60 -> "Caution"
                                 else -> "Insufficient Evidence"
                             },
                             explanation = result.optJSONArray("evidence_indicators")
@@ -339,6 +421,7 @@ class SatarkOverlayService : Service() {
                                         .joinToString(", ")
                                 }
                                 ?.takeIf { value -> value.isNotBlank() }
+                                ?: result.optString("guidance").takeIf { it.isNotBlank() }
                                 ?: "The analyzer found indicators that warrant independent verification.",
                             excerpt = text,
                             location = location,
@@ -353,12 +436,12 @@ class SatarkOverlayService : Service() {
                 }
             } catch (_: IOException) {
                 postToMain {
-                    if (sensing) status = "Backend Unavailable"
+                    if (sensing) status = "Backend Offline"
                     render()
                 }
             } catch (_: JSONException) {
                 postToMain {
-                    if (sensing) status = "Analysis Failed"
+                    if (sensing) status = "Analysis Error"
                     render()
                 }
             }
@@ -391,9 +474,7 @@ class SatarkOverlayService : Service() {
                     )
                 }
             }
-        } catch (_: IOException) {
-            emptyList()
-        } catch (_: JSONException) {
+        } catch (_: Exception) {
             emptyList()
         }
     }
@@ -401,8 +482,8 @@ class SatarkOverlayService : Service() {
     private fun postJson(endpoint: String, body: JSONObject): String {
         val connection = URL(endpoint).openConnection() as HttpURLConnection
         connection.requestMethod = "POST"
-        connection.connectTimeout = 2500
-        connection.readTimeout = 4000
+        connection.connectTimeout = 3000
+        connection.readTimeout = 5000
         connection.doOutput = true
         connection.setRequestProperty("Content-Type", "application/json")
         return try {
@@ -417,7 +498,7 @@ class SatarkOverlayService : Service() {
     }
 
     private fun postToMain(action: () -> Unit) {
-        android.os.Handler(mainLooper).post(action)
+        Handler(Looper.getMainLooper()).post(action)
     }
 
     private fun stopSensing() {
@@ -426,7 +507,7 @@ class SatarkOverlayService : Service() {
         transcriptBuffer = ""
         sequence = 0
         warning = null
-        status = "Stopped"
+        status = "Sensing Paused"
         recognitionRetry?.let(mainHandler::removeCallbacks)
         recognitionRetry = null
         recognitionRetryCount = 0
@@ -439,8 +520,7 @@ class SatarkOverlayService : Service() {
     }
 
     private fun updateSensingNotification() {
-        getSystemService(NotificationManager::class.java)
-            .notify(NOTIFICATION_ID, buildNotification())
+        promoteToForeground()
     }
 
     private fun render() {
@@ -448,6 +528,7 @@ class SatarkOverlayService : Service() {
     }
 
     private fun showOverlay() {
+        if (bubbleView != null) return
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
         bubbleParams = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -459,24 +540,49 @@ class SatarkOverlayService : Service() {
             PixelFormat.TRANSLUCENT
         ).apply {
             gravity = Gravity.TOP or Gravity.END
-            x = 18
-            y = 240
+            x = 20
+            y = 260
         }
+
+        val owner = SatarkLifecycleOwner()
+        lifecycleOwner = owner
+
         bubbleView = ComposeView(this).also { view ->
+            view.setViewTreeLifecycleOwner(owner)
+            view.setViewTreeSavedStateRegistryOwner(owner)
+            view.setViewTreeViewModelStoreOwner(owner)
             view.setContent { OverlayContent() }
             windowManager.addView(view, bubbleParams)
         }
+    }
+
+    private fun openFullApp() {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+        startActivity(intent)
+        expanded = false
+        render()
     }
 
     @Composable
     private fun OverlayContent() {
         MaterialTheme {
             if (!expanded && warning == null) {
-                IconButton(
-                    onClick = { expanded = true; render() },
+                // Circular Assistive Touch Shield Bubble (~54dp)
+                Box(
+                    contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .size(60.dp)
-                        .background(if (sensing) Color(0xFFB45309) else Color(0xFF0F172A), CircleShape)
+                        .size(54.dp)
+                        .background(
+                            color = if (sensing) Color(0xFF0F172A) else Color(0xFF0A0F1D),
+                            shape = CircleShape
+                        )
+                        .border(
+                            width = 2.dp,
+                            color = if (sensing) Color(0xFF34D399) else Color(0xFF38BDF8),
+                            shape = CircleShape
+                        )
                         .pointerInput(Unit) {
                             detectDragGestures { change, dragAmount ->
                                 change.consume()
@@ -488,79 +594,177 @@ class SatarkOverlayService : Service() {
                             }
                         }
                 ) {
-                    Icon(
-                        imageVector = if (sensing) Icons.Default.Warning else Icons.Default.Shield,
-                        contentDescription = if (sensing) "Sensing active" else "Open Satark controls",
-                        tint = Color.White
-                    )
+                    IconButton(
+                        onClick = { expanded = true; render() },
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Shield,
+                            contentDescription = "SATARK Shield Floating Controls",
+                            tint = if (sensing) Color(0xFF34D399) else Color(0xFF38BDF8),
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
                 }
             } else {
+                // Compact Floating Panel Overlay
                 Surface(
-                    modifier = Modifier.padding(8.dp),
-                    shape = RoundedCornerShape(18.dp),
+                    modifier = Modifier
+                        .fillMaxWidth(0.92f)
+                        .padding(6.dp),
+                    shape = RoundedCornerShape(20.dp),
                     color = Color(0xFF0F172A),
                     contentColor = Color.White,
-                    shadowElevation = 12.dp
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF38BDF8).copy(alpha = 0.4f)),
+                    shadowElevation = 16.dp
                 ) {
                     Column(
-                        modifier = Modifier.padding(14.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
+                        // Header Row
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.Shield, contentDescription = null)
-                                Text(" SATARK", style = MaterialTheme.typography.titleMedium)
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Shield,
+                                    contentDescription = null,
+                                    tint = Color(0xFF38BDF8),
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Text(
+                                    text = "SATARK | सतर्क",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = Color.White
+                                )
                             }
                             IconButton(onClick = { warning = null; expanded = false; render() }) {
-                                Icon(Icons.Default.Close, contentDescription = "Dismiss")
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Minimize Panel",
+                                    tint = Color(0xFF94A3B8)
+                                )
                             }
                         }
+
+                        // Suspicious Call Warning Card (if warning != null)
                         warning?.let { current ->
-                            Text(current.level, color = if (current.level == "High") Color(0xFFF87171) else Color(0xFFFBBF24))
-                            Text(current.explanation)
-                            current.detectedLanguage?.let {
-                                Text("Detected language: ${Locale.forLanguageTag(it).getDisplayLanguage(Locale.getDefault())}")
+                            Surface(
+                                shape = RoundedCornerShape(14.dp),
+                                color = if (current.level == "High") Color(0x33EF4444) else Color(0x33F59E0B),
+                                border = androidx.compose.foundation.BorderStroke(
+                                    1.dp,
+                                    if (current.level == "High") Color(0xFFEF4444) else Color(0xFFF59E0B)
+                                ),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                        Icon(
+                                            Icons.Default.Warning,
+                                            contentDescription = null,
+                                            tint = if (current.level == "High") Color(0xFFF87171) else Color(0xFFFBBF24)
+                                        )
+                                        Text(
+                                            text = if (current.level == "High") "POSSIBLE SCAM DETECTED" else "CAUTION REQUIRED",
+                                            color = if (current.level == "High") Color(0xFFF87171) else Color(0xFFFBBF24),
+                                            fontSize = 14.sp,
+                                            style = MaterialTheme.typography.titleSmall
+                                        )
+                                    }
+                                    Text(text = current.explanation, fontSize = 12.sp, color = Color(0xFFE2E8F0))
+                                    Text(
+                                        text = "“${current.excerpt}”",
+                                        fontSize = 11.sp,
+                                        color = Color(0xFF94A3B8),
+                                        modifier = Modifier
+                                            .background(Color(0x22FFFFFF), RoundedCornerShape(6.dp))
+                                            .padding(6.dp)
+                                    )
+                                    current.location?.let {
+                                        Text(text = "Detected location: $it", fontSize = 12.sp, color = Color(0xFF67E8F9))
+                                    }
+                                    current.places.forEach { place ->
+                                        Surface(
+                                            shape = RoundedCornerShape(8.dp),
+                                            color = Color(0xFF1E293B),
+                                            modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
+                                        ) {
+                                            Column(modifier = Modifier.padding(8.dp)) {
+                                                Text(place.name, style = MaterialTheme.typography.titleSmall, fontSize = 12.sp, color = Color.White)
+                                                if (place.address.isNotBlank()) Text(place.address, fontSize = 11.sp, color = Color(0xFFCBD5E1))
+                                                if (place.phone.isNotBlank()) {
+                                                    TextButton(
+                                                        onClick = {
+                                                            startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:${place.phone}")))
+                                                        },
+                                                        modifier = Modifier.padding(top = 2.dp)
+                                                    ) {
+                                                        Icon(Icons.Default.Call, contentDescription = null, modifier = Modifier.size(14.dp))
+                                                        Text(" Call Official: ${place.phone}", fontSize = 11.sp, color = Color(0xFF38BDF8))
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    Text(
+                                        text = "Verify independently before sending money.",
+                                        fontSize = 11.sp,
+                                        color = Color(0xFFFBBF24),
+                                        modifier = Modifier.padding(top = 4.dp)
+                                    )
+                                }
                             }
-                            Text("Transcript: “${current.excerpt}”")
-                            current.location?.let { Text("Detected location: $it") }
-                            current.places.forEach { place ->
-                                Text(place.name, style = MaterialTheme.typography.titleSmall)
-                                if (place.address.isNotBlank()) Text(place.address)
-                                place.distanceKm?.let { Text("Approx. ${it} km away") }
-                                Text(if (place.phone.isBlank()) "Phone number unavailable." else place.phone)
-                                Text("Source: ${place.source}${place.retrievedAt?.let { " • $it" } ?: ""}")
-                                if (place.phone.isNotBlank()) {
-                                    TextButton(onClick = {
-                                        startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:${place.phone}")))
-                                    }) {
-                                        Icon(Icons.Default.Call, contentDescription = null)
-                                        Text(" Call to Verify")
+                        } ?: run {
+                            // Normal Controls Panel
+                            Text(
+                                text = "Backend: $API_BASE_URL",
+                                fontSize = 11.sp,
+                                color = Color(0xFF67E8F9)
+                            )
+                            Text(
+                                text = "Status: $status",
+                                fontSize = 13.sp,
+                                color = if (sensing) Color(0xFF34D399) else Color(0xFFFBBF24)
+                            )
+                            Text(
+                                text = "Note: Uses device microphone only. Android restricts third-party app access to remote cellular/WhatsApp call audio.",
+                                fontSize = 10.sp,
+                                color = Color(0xFF94A3B8),
+                                lineHeight = 14.sp
+                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                if (!sensing) {
+                                    Button(
+                                        onClick = { startSensing() },
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Icon(Icons.Default.Mic, contentDescription = null, modifier = Modifier.size(16.dp))
+                                        Text(" Start Sensing", fontSize = 12.sp)
+                                    }
+                                } else {
+                                    Button(
+                                        onClick = { stopSensing() },
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444)),
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Icon(Icons.Default.Stop, contentDescription = null, modifier = Modifier.size(16.dp))
+                                        Text(" Stop Sensing", fontSize = 12.sp)
                                     }
                                 }
-                            }
-                            current.notice?.let { Text(it, color = Color(0xFFCBD5E1)) }
-                            Text("Verify independently before sending money.")
-                        } ?: run {
-                            Text(status, color = if (sensing) Color(0xFFFBBF24) else Color(0xFF94A3B8))
-                            Text(
-                                "Uses the device microphone only. Android does not provide remote SIM/WhatsApp call audio to this service.",
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Button(
-                                    onClick = { startSensing() },
-                                    enabled = !sensing,
-                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF16A34A))
-                                ) {
-                                    Icon(Icons.Default.Mic, contentDescription = null)
-                                    Text(" Start Sensing")
-                                }
-                                TextButton(onClick = { stopSensing() }, enabled = sensing) {
-                                    Text("Stop Sensing")
+                                TextButton(onClick = { openFullApp() }) {
+                                    Icon(Icons.Default.OpenInNew, contentDescription = null, modifier = Modifier.size(16.dp))
+                                    Text(" Open App", fontSize = 12.sp, color = Color(0xFF38BDF8))
                                 }
                             }
                         }
@@ -573,7 +777,7 @@ class SatarkOverlayService : Service() {
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             getSystemService(NotificationManager::class.java)
-                .createNotificationChannel(
+                ?.createNotificationChannel(
                     NotificationChannel(CHANNEL_ID, "Satark overlay", NotificationManager.IMPORTANCE_LOW)
                 )
         }
@@ -602,6 +806,8 @@ class SatarkOverlayService : Service() {
         executor.shutdownNow()
         bubbleView?.let { if (::windowManager.isInitialized) windowManager.removeView(it) }
         bubbleView = null
+        lifecycleOwner?.destroy()
+        lifecycleOwner = null
         super.onDestroy()
     }
 

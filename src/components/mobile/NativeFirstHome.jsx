@@ -47,26 +47,89 @@ export default function NativeFirstHome() {
   }, []);
 
   useEffect(() => {
-    if (!isNativeApp) return;
-    SatarkNative.getApiBaseUrl()
-      .then((result) => setApiBaseUrl(result?.baseUrl || ''))
-      .catch(() => setBackend('Backend URL unavailable'));
+    let isMounted = true;
+    if (isNativeApp && SatarkNative) {
+      SatarkNative.getApiBaseUrl()
+        .then((result) => {
+          const rawUrl = result?.baseUrl?.trim();
+          const resolved = (rawUrl && rawUrl.length > 0) ? rawUrl : (import.meta.env.VITE_SATARK_API_BASE_URL || 'https://satark-backend-sf2b.onrender.com');
+          console.info('[SATARK diagnostic] Resolved native API base URL:', resolved);
+          if (isMounted) setApiBaseUrl(resolved);
+        })
+        .catch((error) => {
+          const fallback = import.meta.env.VITE_SATARK_API_BASE_URL || 'https://satark-backend-sf2b.onrender.com';
+          console.warn('[SATARK diagnostic] getApiBaseUrl call failed:', error, 'Using fallback:', fallback);
+          if (isMounted) setApiBaseUrl(fallback);
+        });
+    } else {
+      const resolved = import.meta.env.VITE_SATARK_API_BASE_URL || 'https://satark-backend-sf2b.onrender.com';
+      console.info('[SATARK diagnostic] Resolved web API base URL:', resolved);
+      if (isMounted) setApiBaseUrl(resolved);
+    }
+    return () => { isMounted = false; };
   }, []);
 
   useEffect(() => {
-    if (isNativeApp && !apiBaseUrl) return;
-    fetch(apiUrl('/api/v1/health'))
-      .then((response) => {
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return response.json();
-      })
-      .then((health) => setBackend(health.status === 'healthy' ? 'Backend connected' : 'Backend unhealthy'))
-      .catch((error) => setBackend(`Backend unavailable${error.message ? ` (${error.message})` : ''}`));
+    if (!apiBaseUrl) return;
+    const healthEndpoint = apiUrl('/api/v1/health');
+    console.info('[SATARK diagnostic] Executing GET health-check:', healthEndpoint);
+
+    let isCancelled = false;
+    let attemptCount = 0;
+    const maxAttempts = 3;
+
+    const runHealthCheck = async () => {
+      while (attemptCount < maxAttempts && !isCancelled) {
+        attemptCount += 1;
+        if (attemptCount > 1) {
+          setBackend(`Waking up live backend (${attemptCount}/${maxAttempts})…`);
+        } else {
+          setBackend('Checking backend…');
+        }
+
+        const controller = new AbortController();
+        const timeoutId = window.setTimeout(() => controller.abort(), 15000);
+        try {
+          const response = await fetch(healthEndpoint, { signal: controller.signal });
+          window.clearTimeout(timeoutId);
+          console.info('[SATARK diagnostic] Health check HTTP status:', response.status, response.statusText);
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+          const data = await response.json();
+          console.info('[SATARK diagnostic] Health check JSON payload:', data);
+          if (!isCancelled) {
+            setBackend(data?.status === 'healthy' ? 'Backend connected' : 'Backend unhealthy');
+            break;
+          }
+        } catch (error) {
+          window.clearTimeout(timeoutId);
+          const failureReason = error.name === 'AbortError'
+            ? 'Request timed out'
+            : (error instanceof TypeError ? 'Network connection refused or unreachable' : (error.message || 'Request failed'));
+          console.warn(`[SATARK diagnostic] Health check attempt ${attemptCount} failed for URL:`, healthEndpoint, 'Reason:', failureReason);
+          if (attemptCount >= maxAttempts) {
+            if (!isCancelled) {
+              setBackend(`Backend unavailable (${failureReason})`);
+            }
+          } else if (!isCancelled) {
+            await new Promise(resolve => setTimeout(resolve, 2000));
+          }
+        }
+      }
+    };
+
+    void runHealthCheck();
+
     if (isNativeApp) {
       setOverlay('Enable overlay permission from Android settings');
     } else {
       setOverlay('Web mode: Android floating bubble is unavailable here');
     }
+
+    return () => {
+      isCancelled = true;
+    };
   }, [apiBaseUrl]);
 
   const startSensing = async () => {
@@ -306,7 +369,7 @@ export default function NativeFirstHome() {
   if (warning) {
     return (
       <main className="satark-web-shell">
-        <ClaimVerificationPanel result={warning} onClose={() => { setWarning(null); setExpanded(true); }} />
+        <ClaimVerificationPanel result={warning} apiBaseUrl={apiBaseUrl} onClose={() => { setWarning(null); setExpanded(true); }} />
       </main>
     );
   }

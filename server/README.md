@@ -26,3 +26,23 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
 Interactive Swagger API Documentation will be available at:
 👉 **`http://localhost:8000/docs`**
+
+## Deploying on Render
+
+The repository includes a Render Blueprint at `render.yaml`. Push the project to a
+GitHub, GitLab, or Bitbucket repository, then create a new **Blueprint** in Render
+and select that repository. Render will create the `satark-backend` web service
+and deploy this directory.
+
+After deployment, verify `https://<your-service>.onrender.com/api/v1/health`;
+interactive API documentation is at `/docs`. If place search should use Azure
+Maps, add `AZURE_MAPS_KEY` as a secret environment variable in the Render
+service settings. Without it, place search returns its configured
+not-available response.
+
+This deployment installs only the FastAPI backend dependencies. The optional
+PyTorch model in the sibling `model/` directory is not included in the Render
+service; endpoints use their built-in non-model scoring behavior when model
+inference is unavailable. The included in-memory report and lien state is
+intended for demonstration and does not persist across restarts or scale across
+instances.
