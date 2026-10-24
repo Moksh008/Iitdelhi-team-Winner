@@ -1,5 +1,7 @@
 # SATARK implementation status
 
+> **Superseded (v2.0):** Azure Maps and the app-to-backend transcript flow described here were removed for hackathon compliance. Current design: `docs/12_OFFLINE_AI_AND_FREE_SERVICES.md`.
+
 ## Implemented and tested
 
 - React/Vite production build.

@@ -10,6 +10,9 @@ import com.getcapacitor.BridgeActivity;
 public class MainActivity extends BridgeActivity {
     private static final int NOTIFICATION_REQUEST = 3202;
 
+    /** True while the Satark screen is visible; the overlay stays a small bubble then. */
+    public static volatile boolean isInForeground = false;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(SatarkNativePlugin.class);
@@ -18,11 +21,28 @@ public class MainActivity extends BridgeActivity {
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        // The overlay's "Details & nearby help" brings the app forward with a pending alert.
+        SatarkNativePlugin plugin = SatarkNativePlugin.Companion.getInstance();
+        if (plugin != null) plugin.notifyAlertOpened();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
+        isInForeground = true;
+        SatarkOverlayService.Companion.onAppVisibilityChanged(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(this)) {
             startSatarkOverlayService();
         }
+    }
+
+    @Override
+    public void onPause() {
+        isInForeground = false;
+        SatarkOverlayService.Companion.onAppVisibilityChanged(false);
+        super.onPause();
     }
 
     private void startSatarkOverlayService() {

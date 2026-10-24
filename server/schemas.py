@@ -93,11 +93,6 @@ class VerificationEventRequest(BaseModel):
     contact_name: str = Field(..., min_length=1)
     outcome: str = Field(..., min_length=1)
 
-class NearbyPlacesRequest(BaseModel):
-    query: str = Field(..., min_length=2)
-    category: Optional[str] = Field("hospital", min_length=2, max_length=80)
-    limit: int = Field(5, ge=1, le=20)
-
 class TranscriptAnalysisResponse(ClaimVerificationResponse):
     scam_probability: float = Field(..., ge=0.0, le=1.0)
     rolling_c: float = Field(..., ge=0.0, le=1.0)

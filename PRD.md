@@ -1,4 +1,7 @@
 # Product Requirements Document (PRD)
+
+> **Superseded (v2.0):** Azure Maps and the app-to-backend transcript flow described here were removed for hackathon compliance. Current design: `docs/12_OFFLINE_AI_AND_FREE_SERVICES.md`.
+
 ## Project Satark (सतर्क): Real-Time Pre-Payment Scam Shield for UPI
 
 ---

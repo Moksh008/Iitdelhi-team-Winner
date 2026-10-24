@@ -1,24 +1,24 @@
 # Android setup and permissions
 
-Open `D:\Satark-main\android` in Android Studio. Ensure the Android SDK and
-JDK are installed, then build with `.\gradlew.bat assembleDebug`.
+Open `android/` in Android Studio (or use Gradle). Requirements: Android SDK 36,
+JDK 21, NDK 27.2.12479018 and CMake 3.22.1 (for llama.cpp). Generate the speech
+model assets first (`tools/models/export_whisper_onnx.py`). The build targets
+`arm64-v8a` phones.
 
-The manifest requests internet, microphone, notification, foreground-service,
-and overlay permissions. It does not request AccessibilityService, call-log,
-phone-state, or notification-listener access. Overlay settings open only after
-the user chooses to enable sensing. Denying overlay permission leaves the
-normal app usable and manual transcript analysis available.
+Permissions requested, and when:
 
-The overlay is a foreground service using `WindowManager`. OEM battery
-policies, Android version differences, and denied permissions can stop or hide
-it. Native speech results are posted to the existing FastAPI analyzer. The
-default development URL is `http://10.0.2.2:8000` for an Android emulator.
-For a physical device, build with a reachable backend URL:
+| Permission | Why | When |
+|---|---|---|
+| `RECORD_AUDIO` + microphone foreground service | On-device transcription | When the user taps Start listening |
+| `SYSTEM_ALERT_WINDOW` | Floating bubble during calls | When the user enables sensing |
+| `ACCESS_COARSE_LOCATION` | "Use my location" in Nearby help | Only when tapped; never in the background |
+| `POST_NOTIFICATIONS` | Ongoing notification while the bubble or microphone is active | First launch |
+| `INTERNET` | OpenStreetMap lookups and the optional model download | User-initiated |
 
-```powershell
-Set-Location D:\Satark-main\android
-.\gradlew.bat assembleDebug -PSATARK_API_BASE_URL=https://your-api.example.com
-```
+No AccessibilityService, call-log, phone-state or notification-listener access
+is requested. Denying any permission leaves typed-text analysis and manual
+place search usable. Revoke permissions in Android Settings → Apps → Satark.
 
-Use HTTPS outside a local development network. Ordinary GSM and WhatsApp call
-audio are not captured.
+The overlay is a foreground service (`microphone|specialUse`). OEM battery
+policies can still stop it. Ordinary GSM and WhatsApp remote audio is not
+captured; only the phone's microphone is used.

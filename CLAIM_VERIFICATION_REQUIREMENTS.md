@@ -1,5 +1,7 @@
 # Satark Independent Claim Verification
 
+> **Superseded (v2.0):** Azure Maps and the app-to-backend transcript flow described here were removed for hackathon compliance. Current design: `docs/12_OFFLINE_AI_AND_FREE_SERVICES.md`.
+
 ## 1. Purpose
 
 This document defines the requirements for a Satark feature that helps a user independently verify an urgent claim made during a suspicious call.

@@ -72,11 +72,11 @@ from schemas import (
     TranscriptChunkRequest,
     ClaimVerificationResponse,
     VerificationEventRequest
-    , NearbyPlacesRequest, TranscriptAnalysisResponse
+    , TranscriptAnalysisResponse
 )
 
 from fusion_engine import PIIScrubber, ScamPsychologyAnalyzer, TriSignalFusionEngine
-from claim_verification import resolve_claim, nearby_places
+from claim_verification import resolve_claim
 from language_detection import detect_transcript_language
 
 app = FastAPI(
@@ -234,11 +234,6 @@ def analyze_transcript_chunk(req: TranscriptChunkRequest):
         ],
         "place_category": claim.get("place_category"),
     }
-
-@app.post("/api/v1/places/search")
-@app.post("/api/v1/nearby-places")
-def nearby_places_lookup(req: NearbyPlacesRequest):
-    return nearby_places(req.query, req.category or "hospital", req.limit)
 
 @app.get("/api/v1/health")
 def health_check():

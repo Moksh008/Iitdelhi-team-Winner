@@ -1,0 +1,100 @@
+{
+  "note": "Parity vectors for src/engine/localAnalyzer.js and android SatarkRules.kt. 'session' lists utterances fed in order to one session; the expectation applies after the last one.",
+  "cases": [
+    {
+      "name": "digital arrest, English",
+      "session": ["I am calling from the CBI cyber crime cell. Your Aadhaar is linked to a narcotics parcel. Do not disconnect this call."],
+      "clusters": ["AUTHORITY", "ISOLATION"], "category": "digital_arrest", "tier": 1, "score": 0.95
+    },
+    {
+      "name": "digital arrest, romanised Hinglish (Whisper output style)",
+      "session": ["main police station se bol raha hoon aapke khilaf arrest warrant hai kisi ko mat batana aur turant paise bhejo"],
+      "clusters": ["AUTHORITY", "ISOLATION", "PAYMENT_REQUEST", "URGENCY"], "category": "digital_arrest", "tier": 1, "score": 0.95
+    },
+    {
+      "name": "digital arrest, Devanagari",
+      "session": ["पुलिस अधिकारी बोल रहा हूँ, आपके नाम पर वारंट है, किसी को मत बताना"],
+      "clusters": ["AUTHORITY", "ISOLATION"], "category": "digital_arrest", "tier": 1, "score": 0.95
+    },
+    {
+      "name": "family emergency with urgency",
+      "session": ["your son had an accident near anardana chowk in patiala he is admitted in the hospital send fifty thousand rupees immediately"],
+      "clusters": ["EMERGENCY", "PAYMENT_REQUEST", "URGENCY"], "category": "family_emergency", "tier": 1, "score": 0.86
+    },
+    {
+      "name": "Whisper writes amounts as digits (real on-device transcript)",
+      "session": ["your son had an accident near an ardh nirdh chowk in padella", "he is admitted in the hospital", "send 50 thousand rupees immediately"],
+      "clusters": ["EMERGENCY", "PAYMENT_REQUEST", "URGENCY"], "category": "family_emergency", "tier": 1, "score": 0.86
+    },
+    {
+      "name": "cues spread across utterances combine within a session",
+      "session": ["hello this is inspector sharma from the crime branch", "we need to verify something", "abhi paise bhej do"],
+      "clusters": ["AUTHORITY", "PAYMENT_REQUEST"], "category": "authority_impersonation", "tier": 1, "score": 0.9
+    },
+    {
+      "name": "safe account on its own is enough",
+      "session": ["transfer all your savings to this rbi safe account for verification"],
+      "clusters": ["SAFE_ACCOUNT"], "category": "safe_account_transfer", "tier": 1, "score": 0.9
+    },
+    {
+      "name": "OTP request with account threat",
+      "session": ["sir your kyc is pending your bank account will be blocked today please share the otp"],
+      "clusters": ["ACCOUNT_THREAT", "CREDENTIAL"], "category": "kyc_or_account_block", "tier": 1, "score": 0.9
+    },
+    {
+      "name": "remote access app",
+      "session": ["please install anydesk so I can fix your refund"],
+      "clusters": ["PRIZE", "REMOTE_ACCESS"], "category": "remote_access", "tier": 1, "score": 0.88
+    },
+    {
+      "name": "prize needs a fee",
+      "session": ["aapne lottery jeeti hai inaam lene ke liye processing fee bhejiye"],
+      "clusters": ["PAYMENT_REQUEST", "PRIZE"], "category": "prize_or_refund", "tier": 1, "score": 0.82
+    },
+    {
+      "name": "relative on a new number asking for money",
+      "session": ["beta mera phone kho gaya is naya number pe paise bhej do"],
+      "clusters": ["NEW_NUMBER", "PAYMENT_REQUEST"], "category": "family_emergency", "tier": 1, "score": 0.82
+    },
+    {
+      "name": "police mention alone stays quiet",
+      "session": ["I will go to the police station tomorrow to collect my passport"],
+      "clusters": ["AUTHORITY"], "category": null, "tier": 0, "score": 0.55
+    },
+    {
+      "name": "'first' must not match the term 'fir'",
+      "session": ["first we will have lunch and then go to the market"],
+      "clusters": [], "category": null, "tier": 0, "score": 0
+    },
+    {
+      "name": "ordinary family call",
+      "session": ["hi mom i will be home by seven please keep dinner ready"],
+      "clusters": [], "category": null, "tier": 0, "score": 0
+    },
+    {
+      "name": "ordinary Hinglish call",
+      "session": ["kal office mein meeting hai das baje aa jana"],
+      "clusters": [], "category": null, "tier": 0, "score": 0
+    },
+    {
+      "name": "prefix wildcard matches inflections",
+      "session": ["unko arrested kar liya jayega agar aapne jurmana nahi bhara"],
+      "clusters": ["ACCOUNT_THREAT", "AUTHORITY"], "category": "authority_impersonation", "tier": 1, "score": 0.9
+    },
+    {
+      "name": "extortion: harm threat plus payment",
+      "session": ["we have your brother with us", "send money to this upi id or you will never see him again"],
+      "clusters": ["HARM_THREAT", "PAYMENT_REQUEST"], "category": "extortion", "tier": 1, "score": 0.92
+    },
+    {
+      "name": "advance fee: job offer needing a deposit",
+      "session": ["this is a work from home job with daily payout", "first make a small deposit to activate your account"],
+      "clusters": ["OFFER", "UPFRONT_FEE"], "category": "advance_fee", "tier": 1, "score": 0.85
+    },
+    {
+      "name": "OTP mention alone is a solo advisory",
+      "session": ["please read out the otp you just received"],
+      "clusters": ["CREDENTIAL"], "category": "advisory", "tier": 1, "score": 0.7
+    }
+  ]
+}

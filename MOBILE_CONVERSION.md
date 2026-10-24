@@ -1,5 +1,7 @@
 # Converting Satark into a Native Mobile Application (Android / iOS)
 
+> **Superseded (v2.0):** Azure Maps and the app-to-backend transcript flow described here were removed for hackathon compliance. Current design: `docs/12_OFFLINE_AI_AND_FREE_SERVICES.md`.
+
 The Satark codebase is architected with a **mobile-first, responsive design** and comes pre-configured with:
 - `viewport-fit=cover`, mobile status bar safe-area insets
 - Web App Manifest (`public/manifest.json`)

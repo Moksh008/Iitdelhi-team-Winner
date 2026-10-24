@@ -5,6 +5,7 @@ apply plugin: 'org.jetbrains.kotlin.plugin.compose'
 android {
     namespace = "in.satark.shield"
     compileSdk = rootProject.ext.compileSdkVersion
+    ndkVersion = "27.2.12479018"
     buildFeatures {
         buildConfig true
     }
@@ -12,19 +13,49 @@ android {
         applicationId "in.satark.shield"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2
-        versionName "1.1"
-        def rawApiBaseUrl = project.findProperty('SATARK_API_BASE_URL')?.toString()?.trim()
-        def satarkApiBaseUrl = (rawApiBaseUrl && rawApiBaseUrl.length() > 0) ? rawApiBaseUrl : 'http://10.0.2.2:8000'
-        buildConfigField "String", "SATARK_API_BASE_URL", "\"${satarkApiBaseUrl}\""
+        versionCode 4
+        versionName "2.3"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
+        ndk {
+            // On-device inference targets 64-bit ARM phones.
+            abiFilters 'arm64-v8a'
+        }
+        externalNativeBuild {
+            cmake {
+                arguments '-DANDROID_STL=c++_shared', '-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON'
+            }
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path 'src/main/cpp/CMakeLists.txt'
+            version '3.22.1'
+        }
+    }
+    sourceSets {
+        // shared/scam-lexicon.json is used by both the web rules and SatarkRules.kt.
+        main.assets.srcDirs += "${rootDir}/../shared"
+    }
+    androidResources {
+        // Model files are opened directly; compression would only slow loading.
+        noCompress += ['onnx', 'bin', 'json']
+    }
+    testOptions {
+        unitTests.returnDefaultValues = true
     }
     buildTypes {
+        debug {
+            // Also build x86_64 so the app can be functionally tested on an emulator
+            // (ARM translation on emulators cannot run ONNX Runtime's arm64 library).
+            ndk {
+                abiFilters 'arm64-v8a', 'x86_64'
+            }
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -51,10 +82,20 @@ dependencies {
     implementation 'androidx.compose.material:material-icons-extended'
     implementation 'androidx.compose.ui:ui-tooling-preview'
     implementation project(':capacitor-android')
+    // On-device Whisper speech recognition (MIT licence, Maven Central).
+    implementation 'com.microsoft.onnxruntime:onnxruntime-android:1.31.0'
     testImplementation "junit:junit:$junitVersion"
+    testImplementation 'org.json:json:20240303'
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.3.0'
+    androidTestImplementation 'androidx.test:runner:1.7.0'
     implementation project(':capacitor-cordova-android-plugins')
+}
+
+// Unit tests read the shared rule lexicon and vectors; re-run them when those change.
+tasks.withType(Test).configureEach {
+    inputs.dir("${rootDir}/../shared")
 }
 
 apply from: 'capacitor.build.gradle'

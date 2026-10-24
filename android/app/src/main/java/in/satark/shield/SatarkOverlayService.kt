@@ -6,23 +6,20 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.ComponentCallbacks2
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.graphics.PixelFormat
-import android.net.Uri
+import android.media.AudioManager
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.provider.Settings
-import android.speech.RecognitionListener
-import android.speech.RecognizerIntent
-import android.speech.SpeechRecognizer
 import android.util.Log
 import android.view.Gravity
 import android.view.WindowManager
-import androidx.core.content.ContextCompat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -31,12 +28,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.OpenInNew
@@ -63,6 +64,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -74,12 +76,8 @@ import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
-import org.json.JSONException
+import org.json.JSONArray
 import org.json.JSONObject
-import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.URL
-import java.util.Locale
 import java.util.concurrent.Executors
 
 class SatarkLifecycleOwner : LifecycleOwner, SavedStateRegistryOwner, ViewModelStoreOwner {
@@ -106,421 +104,444 @@ class SatarkLifecycleOwner : LifecycleOwner, SavedStateRegistryOwner, ViewModelS
     }
 }
 
+/**
+ * Floating bubble + microphone sensing. Speech is transcribed on the device by
+ * Whisper and checked by the deterministic rules; nothing is sent off the phone.
+ * The bubble only shows an advisory — it never blocks payments or calls anyone.
+ */
 class SatarkOverlayService : Service() {
     companion object {
         const val ACTION_START = "in.satark.shield.START_SENSING"
         const val ACTION_STOP = "in.satark.shield.STOP_SENSING"
-        const val EXTRA_SPEECH_LOCALE = "speech_locale"
-        const val EXTRA_ANALYSIS_LANGUAGE = "analysis_language"
-        const val EXTRA_AUTO_LANGUAGE_DETECTION = "auto_language_detection"
+        /** Set when listening was started from the Satark screen, which shows the live text itself. */
+        const val EXTRA_FROM_APP = "from_app"
+        /** Debug builds only: feed a WAV through the same segmenter the microphone uses. */
+        const val ACTION_DEBUG_FEED = "in.satark.shield.DEBUG_FEED"
+        const val EXTRA_WAV_PATH = "wav_path"
         private const val CHANNEL_ID = "satark_overlay"
         private const val NOTIFICATION_ID = 4242
-        private val API_BASE_URL = (if (BuildConfig.SATARK_API_BASE_URL.isNotBlank()) BuildConfig.SATARK_API_BASE_URL else "http://10.0.2.2:8000").trimEnd('/')
+        private const val MAX_TRANSCRIPT_CHARS = 1200
+        private const val MAX_BATCH_SAMPLES = 25 * WhisperEngine.SAMPLE_RATE
+        private const val WATCHDOG_MS = 2000L
+        private const val RESTART_AFTER_MS = 4000L
+        @Volatile var isRunning = false
+            private set
+        @Volatile var isListening = false
+            private set
+        /** Debug builds only: last transcript and alert, read by SatarkNativePlugin.debugOverlayState. */
+        @Volatile var debugState: JSONObject = JSONObject()
+            private set
+        const val ACTION_DEBUG_OPEN_DETAILS = "in.satark.shield.DEBUG_OPEN_DETAILS"
+        @Volatile private var instance: SatarkOverlayService? = null
+
+        /** Called by MainActivity: hide the bubble while Satark itself is on screen. */
+        fun onAppVisibilityChanged(appVisible: Boolean) {
+            val service = instance ?: return
+            service.mainHandler.post {
+                if (appVisible) service.hideOverlay() else service.showOverlay()
+            }
+        }
+
+        /** Latest listening state, for the app to read when it opens. */
+        @Volatile var latestState: JSONObject = JSONObject().put("listening", false).put("status", "Not listening")
+            private set
     }
-
-    private data class Place(
-        val name: String,
-        val address: String,
-        val phone: String,
-        val distanceKm: Double?,
-        val source: String,
-        val retrievedAt: String?
-    )
-
-    private data class Warning(
-        val level: String,
-        val explanation: String,
-        val excerpt: String,
-        val location: String?,
-        val detectedLanguage: String?,
-        val places: List<Place>,
-        val notice: String?
-    )
 
     private lateinit var windowManager: WindowManager
     private var bubbleView: ComposeView? = null
     private var bubbleParams: WindowManager.LayoutParams? = null
     private var lifecycleOwner: SatarkLifecycleOwner? = null
-    private var recognizer: SpeechRecognizer? = null
-    private val executor = Executors.newSingleThreadExecutor()
-    private var sensing by mutableStateOf(false)
-    private var expanded by mutableStateOf(false)
-    private var status by mutableStateOf("Sensing Paused")
-    private var warning by mutableStateOf<Warning?>(null)
-    private var sessionId: String? = null
-    private var transcriptBuffer = ""
-    private var sequence = 0
-    private var speechLocale = Locale.getDefault().toLanguageTag()
-    private var analysisLanguage = Locale.getDefault().language
-    private var autoDetectLanguage = false
-    private var currentDetectedLanguage: String? = null
     private val mainHandler = Handler(Looper.getMainLooper())
-    private var recognitionRetryCount = 0
-    private var recognitionRetry: Runnable? = null
+    private val transcriber = Executors.newSingleThreadExecutor()
+    private val waitingAudio = ArrayDeque<FloatArray>()
+    private var transcribeScheduled = false
+    private var capture: MicrophoneCapture? = null
+    private lateinit var rules: SatarkRules
+    private var session: SatarkRules.Session? = null
+    private var transcript = ""
+
+    private var sensingState = mutableStateOf(false)
+    private var sensing: Boolean
+        get() = sensingState.value
+        set(value) {
+            sensingState.value = value
+            isListening = value
+        }
+    private var expanded by mutableStateOf(false)
+    private var status by mutableStateOf("Not listening")
+    private var lastHeard by mutableStateOf("")
+    /** Last few things heard, newest last, shown live in the bubble and the app. */
+    private var heardLines by mutableStateOf(listOf<String>())
+    /** Microphone loudness 0..1 for the level meter. */
+    private var micLevel by mutableStateOf(0f)
+    private var hearingSpeech by mutableStateOf(false)
+    private var transcribing by mutableStateOf(false)
+    private var micBlocked by mutableStateOf(false)
+    private var inCall by mutableStateOf(false)
+    private var blockedSince = 0L
+    private var lastRestart = 0L
+    private var lastLevelPublish = 0L
+    private var alert by mutableStateOf<SatarkRules.Result?>(null)
+    private var alertExcerpt = ""
 
     override fun onCreate() {
         super.onCreate()
+        isRunning = true
+        instance = this
+        rules = SatarkRules(assets.open("scam-lexicon.json").bufferedReader().use { it.readText() })
         createNotificationChannel()
         promoteToForeground()
         if (Settings.canDrawOverlays(this)) showOverlay()
     }
 
-    private fun promoteToForeground() {
-        val hasMicPermission = ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.RECORD_AUDIO
-        ) == PackageManager.PERMISSION_GRANTED
+    private fun hasMicPermission() =
+        ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
 
+    private fun promoteToForeground() {
+        val notification = buildNotification()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val serviceType = if (hasMicPermission) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE or ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
-                } else {
-                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
-                }
-            } else {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
-                } else {
-                    0
-                }
+            val type = when {
+                sensing && hasMicPermission() -> ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+                else -> 0
             }
             try {
-                startForeground(NOTIFICATION_ID, buildNotification(), serviceType)
-            } catch (e: Exception) {
-                Log.w("SatarkOverlayService", "Failed to startForeground with type $serviceType, trying fallback", e)
-                try {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                        startForeground(NOTIFICATION_ID, buildNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
-                    } else {
-                        startForeground(NOTIFICATION_ID, buildNotification())
-                    }
-                } catch (e2: Exception) {
-                    Log.e("SatarkOverlayService", "Fallback startForeground failed", e2)
-                }
+                startForeground(NOTIFICATION_ID, notification, type)
+            } catch (error: Exception) {
+                Log.w("SatarkOverlay", "startForeground with type $type failed", error)
+                startForeground(NOTIFICATION_ID, notification)
             }
         } else {
-            startForeground(NOTIFICATION_ID, buildNotification())
+            startForeground(NOTIFICATION_ID, notification)
         }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        intent?.getStringExtra(EXTRA_SPEECH_LOCALE)
-            ?.takeIf { it.isNotBlank() }
-            ?.let { speechLocale = it }
-        intent?.getStringExtra(EXTRA_ANALYSIS_LANGUAGE)
-            ?.takeIf { it.isNotBlank() }
-            ?.let { analysisLanguage = it }
-        autoDetectLanguage = intent?.getBooleanExtra(EXTRA_AUTO_LANGUAGE_DETECTION, false) ?: false
-        if (autoDetectLanguage) analysisLanguage = "auto"
-        currentDetectedLanguage = null
         when (intent?.action) {
-            ACTION_START -> startSensing()
+            ACTION_START -> startSensing(fromApp = intent.getBooleanExtra(EXTRA_FROM_APP, false))
             ACTION_STOP -> stopSensing()
+            ACTION_DEBUG_FEED -> if (BuildConfig.DEBUG) debugFeed(intent.getStringExtra(EXTRA_WAV_PATH))
+            ACTION_DEBUG_OPEN_DETAILS -> if (BuildConfig.DEBUG && alert != null) openDetails()
         }
-        return START_STICKY
+        return START_NOT_STICKY
     }
 
-    private fun startSensing() {
-        if (!Settings.canDrawOverlays(this)) {
-            status = "Overlay permission required"
-            expanded = true
-            render()
-            return
-        }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            status = "Microphone permission required"
-            expanded = true
-            render()
-            return
-        }
-        if (!SpeechRecognizer.isRecognitionAvailable(this)) {
-            status = "Speech recognition service unavailable on device"
-            sensing = false
-            expanded = true
-            render()
-            return
+    private fun startSensing(fromApp: Boolean = false) {
+        if (sensing) return
+        when {
+            !Settings.canDrawOverlays(this) -> { status = "Allow 'Display over other apps' first"; expanded = true; render(); return }
+            !hasMicPermission() -> { status = "Microphone permission required"; expanded = true; render(); return }
+            !SpeechModel.isBundled(this) -> { status = "Speech model missing from this build"; expanded = true; render(); return }
         }
         sensing = true
-        warning = null
-        sessionId = "native-${System.currentTimeMillis()}"
-        transcriptBuffer = ""
-        sequence = 0
-        recognitionRetryCount = 0
-        status = "Microphone active (Call Audio Unavailable)"
-        expanded = false
-        updateSensingNotification()
-        recognizer?.destroy()
-        recognizer = SpeechRecognizer.createSpeechRecognizer(this).also { speech ->
-            speech.setRecognitionListener(object : RecognitionListener {
-                override fun onResults(results: android.os.Bundle?) {
-                    recognitionRetryCount = 0
-                    val text = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                        ?.firstOrNull().orEmpty()
-                    if (text.isBlank()) {
-                        status = "Listening for speech..."
-                        render()
-                    } else {
-                        transcriptBuffer = listOf(transcriptBuffer, text)
-                            .filter { it.isNotBlank() }
-                            .joinToString("\n")
-                        status = "Analyzing transcript..."
-                        render()
-                        val language = if (autoDetectLanguage) {
-                            currentDetectedLanguage ?: "auto"
-                        } else {
-                            analysisLanguage
-                        }
-                        analyzeTranscript(transcriptBuffer, language)
-                    }
-                    currentDetectedLanguage = null
-                    if (sensing) listen(speech)
-                }
-
-                override fun onError(error: Int) {
-                    scheduleRecognitionRetry(speech, error)
-                }
-
-                override fun onReadyForSpeech(params: android.os.Bundle?) {
-                    if (sensing) {
-                        status = "Microphone active (Call Audio Unavailable)"
-                        render()
-                    }
-                }
-                override fun onBeginningOfSpeech() {
-                    currentDetectedLanguage = null
-                }
-                override fun onLanguageDetection(results: android.os.Bundle) {
-                    if (!autoDetectLanguage) return
-                    val confidence = results.getInt(
-                        SpeechRecognizer.LANGUAGE_DETECTION_CONFIDENCE_LEVEL,
-                        SpeechRecognizer.LANGUAGE_DETECTION_CONFIDENCE_LEVEL_UNKNOWN
-                    )
-                    val tag = results.getString(SpeechRecognizer.DETECTED_LANGUAGE)
-                        ?.takeIf { it.isNotBlank() }
-                    if (
-                        tag != null
-                        && confidence >= SpeechRecognizer.LANGUAGE_DETECTION_CONFIDENCE_LEVEL_CONFIDENT
-                    ) {
-                        currentDetectedLanguage = Locale.forLanguageTag(tag).language
-                        status = "Detected ${Locale.forLanguageTag(tag).getDisplayLanguage(Locale.getDefault())}; analyzing"
-                        render()
-                    }
-                }
-                override fun onRmsChanged(rmsdB: Float) = Unit
-                override fun onBufferReceived(buffer: ByteArray?) = Unit
-                override fun onEndOfSpeech() = Unit
-                override fun onPartialResults(partialResults: android.os.Bundle?) = Unit
-                override fun onEvent(eventType: Int, params: android.os.Bundle?) = Unit
-            })
-            listen(speech)
-        }
-        render()
-    }
-
-    private fun listen(speech: SpeechRecognizer) {
-        if (!sensing || recognizer !== speech) return
-        val request = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-            putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, false)
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, speechLocale)
-            if (autoDetectLanguage && Build.VERSION.SDK_INT >= 34) {
-                val allowedLanguages = arrayListOf(
-                    "en-IN", "hi-IN", "bn-IN", "gu-IN", "mr-IN", "ta-IN", "te-IN",
-                    "kn-IN", "ml-IN", "pa-IN", "or-IN", "as-IN", "ur-IN", "ne-NP"
-                )
-                putExtra(RecognizerIntent.EXTRA_ENABLE_LANGUAGE_DETECTION, true)
-                putExtra(RecognizerIntent.EXTRA_ENABLE_LANGUAGE_SWITCH, true)
-                putStringArrayListExtra(
-                    RecognizerIntent.EXTRA_LANGUAGE_DETECTION_ALLOWED_LANGUAGES,
-                    allowedLanguages
-                )
-                putStringArrayListExtra(
-                    RecognizerIntent.EXTRA_LANGUAGE_SWITCH_ALLOWED_LANGUAGES,
-                    allowedLanguages
-                )
-            }
-        }
-        try {
-            speech.startListening(request)
-        } catch (_: RuntimeException) {
-            scheduleRecognitionRetry(speech, SpeechRecognizer.ERROR_CLIENT)
-        }
-    }
-
-    private fun scheduleRecognitionRetry(speech: SpeechRecognizer, error: Int) {
-        if (!sensing || recognizer !== speech) return
-        if (error == SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS || recognitionRetryCount >= 3) {
-            sensing = false
-            status = "Microphone speech input paused (Use Manual Fallback)"
-            recognitionRetry?.let(mainHandler::removeCallbacks)
-            recognitionRetry = null
-            speech.cancel()
-            speech.destroy()
-            recognizer = null
-            updateSensingNotification()
-            render()
-            return
-        }
-
-        recognitionRetryCount++
-        val delayMs = 1000L * recognitionRetryCount
-        status = "Microphone retrying... (Call Audio Unavailable)"
-        recognitionRetry?.let(mainHandler::removeCallbacks)
-        recognitionRetry = Runnable {
-            recognitionRetry = null
-            listen(speech)
-        }.also { mainHandler.postDelayed(it, delayMs) }
-        updateSensingNotification()
-        render()
-    }
-
-    private fun analyzeTranscript(text: String, detectedLanguage: String = analysisLanguage) {
-        if (text.isBlank() || !sensing) return
-        executor.execute {
-            try {
-                val response = postJson(
-                    "$API_BASE_URL/api/v1/analyze-transcript",
-                    JSONObject()
-                        .put("session_id", sessionId)
-                        .put("sequence", sequence++)
-                        .put("text", text)
-                        .put("language", detectedLanguage)
-                        .put("is_final", true)
-                )
-                val result = JSONObject(response)
-                val score = result.optDouble("scam_probability", result.optDouble("score", 0.0))
-                val tier = result.optInt("action_tier", 0)
-                val entities = result.optJSONArray("entities")
-                val location = result.optString("extracted_location").takeIf { !it.isNullOrBlank() } ?: entities?.let { array ->
-                    (0 until array.length())
-                        .map { array.optJSONObject(it) }
-                        .firstOrNull {
-                            it?.optString("type") == "LOCATION" ||
-                                it?.optString("type") == "HOSPITAL"
-                        }
-                        ?.optString("normalized_text")
-                }
-                if (tier > 0 || score >= 0.60) {
-                    val category = result.optString("place_category", "hospital")
-                    val places = if (!location.isNullOrBlank()) searchPlaces(location, category) else emptyList()
-                    postToMain {
-                        warning = Warning(
-                            level = when {
-                                tier >= 2 || score >= 0.8 -> "High"
-                                tier == 1 || score >= 0.60 -> "Caution"
-                                else -> "Insufficient Evidence"
-                            },
-                            explanation = result.optJSONArray("evidence_indicators")
-                                ?.let { indicators ->
-                                    (0 until indicators.length())
-                                        .map { index -> indicators.optString(index) }
-                                        .filter { value -> value.isNotBlank() }
-                                        .joinToString(", ")
-                                }
-                                ?.takeIf { value -> value.isNotBlank() }
-                                ?: result.optString("guidance").takeIf { it.isNotBlank() }
-                                ?: "The analyzer found indicators that warrant independent verification.",
-                            excerpt = text,
-                            location = location,
-                            detectedLanguage = result.optString("detected_language")
-                                .takeIf { it.isNotBlank() && it != "auto" },
-                            places = places,
-                            notice = result.optString("notice").takeIf { it.isNotBlank() }
-                        )
-                        expanded = true
-                        render()
-                    }
-                }
-            } catch (_: IOException) {
-                postToMain {
-                    if (sensing) status = "Backend Offline"
-                    render()
-                }
-            } catch (_: JSONException) {
-                postToMain {
-                    if (sensing) status = "Analysis Error"
-                    render()
-                }
-            }
-        }
-    }
-
-    private fun searchPlaces(location: String, category: String): List<Place> {
-        return try {
-            val result = JSONObject(
-                postJson(
-                    "$API_BASE_URL/api/v1/places/search",
-                    JSONObject().put("query", location).put("category", category).put("limit", 3)
-                )
-            )
-            val places = result.optJSONArray("places") ?: return emptyList()
-            (0 until places.length()).mapNotNull { index ->
-                places.optJSONObject(index)?.let {
-                    Place(
-                        name = it.optString("name", "Unnamed place"),
-                        address = it.optString("address"),
-                        phone = it.optString("phone"),
-                        distanceKm = if (it.has("distance_km") && !it.isNull("distance_km")) {
-                            it.optDouble("distance_km")
-                        } else {
-                            null
-                        },
-                        source = it.optString("source", result.optString("provider", "provider")),
-                        retrievedAt = it.optString("retrieved_at")
-                            .takeIf { value -> value.isNotBlank() }
-                    )
-                }
-            }
-        } catch (_: Exception) {
-            emptyList()
-        }
-    }
-
-    private fun postJson(endpoint: String, body: JSONObject): String {
-        val connection = URL(endpoint).openConnection() as HttpURLConnection
-        connection.requestMethod = "POST"
-        connection.connectTimeout = 3000
-        connection.readTimeout = 5000
-        connection.doOutput = true
-        connection.setRequestProperty("Content-Type", "application/json")
-        return try {
-            connection.outputStream.use { it.write(body.toString().toByteArray(Charsets.UTF_8)) }
-            if (connection.responseCode !in 200..299) {
-                throw IOException("HTTP ${connection.responseCode}")
-            }
-            connection.inputStream.bufferedReader().use { it.readText() }
-        } finally {
-            connection.disconnect()
-        }
-    }
-
-    private fun postToMain(action: () -> Unit) {
-        Handler(Looper.getMainLooper()).post(action)
-    }
-
-    private fun stopSensing() {
-        sensing = false
-        sessionId = null
-        transcriptBuffer = ""
-        sequence = 0
-        warning = null
-        status = "Sensing Paused"
-        recognitionRetry?.let(mainHandler::removeCallbacks)
-        recognitionRetry = null
-        recognitionRetryCount = 0
-        recognizer?.cancel()
-        recognizer?.destroy()
-        recognizer = null
-        updateSensingNotification()
-        expanded = false
-        render()
-    }
-
-    private fun updateSensingNotification() {
+        alert = null
+        transcript = ""
+        lastHeard = ""
+        heardLines = emptyList()
+        micBlocked = false
+        session = rules.Session()
+        status = "Loading on-device speech model…"
+        // The app shows the live text itself; open the panel only over other apps.
+        expanded = !fromApp && !MainActivity.isInForeground
         promoteToForeground()
+        render()
+        publish()
+        transcriber.execute {
+            try {
+                SpeechModel.get(this)
+                mainHandler.post {
+                    if (!sensing) return@post
+                    startCapture()
+                    status = "Listening - speak now"
+                    render()
+                    publish()
+                    mainHandler.removeCallbacks(micWatchdog)
+                    mainHandler.postDelayed(micWatchdog, WATCHDOG_MS)
+                }
+            } catch (error: Throwable) {
+                Log.e("SatarkOverlay", "speech model failed to load", error)
+                mainHandler.post {
+                    sensing = false
+                    status = if (error is OutOfMemoryError) "Not enough memory for speech recognition" else "Speech model failed to load"
+                    expanded = true
+                    promoteToForeground()
+                    render()
+                    publish()
+                }
+            }
+        }
+    }
+
+    private fun startCapture() {
+        val segmenter = SpeechSegmenter(onUtterance = ::onUtterance, onLevel = ::onLevel)
+        capture = MicrophoneCapture(
+            segmenter,
+            onError = { message ->
+                mainHandler.post { if (sensing) { stopSensing(); status = message; expanded = true; render(); publish() } }
+            },
+            onSilenced = { blocked ->
+                mainHandler.post {
+                    micBlocked = blocked
+                    blockedSince = if (blocked) System.currentTimeMillis() else 0L
+                    refreshStatus()
+                    publish()
+                }
+            },
+        ).also { it.start() }
+    }
+
+    /** True while a phone or VoIP call holds the audio system. Needs no permission. */
+    private fun phoneCallActive(): Boolean {
+        val mode = (getSystemService(AUDIO_SERVICE) as AudioManager).mode
+        return mode == AudioManager.MODE_IN_CALL || mode == AudioManager.MODE_IN_COMMUNICATION ||
+            (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && mode == AudioManager.MODE_CALL_SCREENING)
+    }
+
+    /**
+     * Android gives other apps silence from the microphone during a call (and the
+     * recorder can stay silent after it). Every few seconds: note whether a call is
+     * on, and once the call is over restart a microphone that is still silent.
+     */
+    private val micWatchdog = object : Runnable {
+        override fun run() {
+            if (!sensing) return
+            val call = phoneCallActive()
+            if (call != inCall) {
+                inCall = call
+                refreshStatus()
+                render()
+                publish()
+            }
+            val now = System.currentTimeMillis()
+            if (micBlocked && !call && blockedSince > 0 && now - blockedSince > RESTART_AFTER_MS && now - lastRestart > RESTART_AFTER_MS) {
+                lastRestart = now
+                Log.i("SatarkOverlay", "microphone still silent after the call; restarting it")
+                val old = capture
+                capture = null
+                Thread({
+                    old?.stop()
+                    mainHandler.post {
+                        if (!sensing) return@post
+                        micBlocked = false
+                        blockedSince = 0L
+                        startCapture()
+                        refreshStatus()
+                        publish()
+                    }
+                }, "satark-mic-restart").start()
+            }
+            mainHandler.postDelayed(this, WATCHDOG_MS)
+        }
+    }
+
+    private var debugSegmenter: SpeechSegmenter? = null
+
+    private fun debugFeed(path: String?) {
+        if (path == null || !sensing) return
+        val segmenter = debugSegmenter ?: SpeechSegmenter(onUtterance = ::onUtterance, onLevel = ::onLevel).also { debugSegmenter = it }
+        Thread {
+            val audio = SpeechModel.readWav(java.io.File(path))
+            // 100 ms frames, as from the microphone, followed by 1.5 s of silence.
+            val padded = audio.copyOf(audio.size + 24_000)
+            for (start in 0 until padded.size - 1599 step 1600) {
+                segmenter.accept(padded.copyOfRange(start, start + 1600))
+                Thread.sleep(100) // real-time pace, like the microphone
+            }
+        }.start()
+    }
+
+    /** Called on the microphone thread for every 100 ms frame. */
+    private fun onLevel(rms: Float, inSpeech: Boolean) {
+        val now = System.currentTimeMillis()
+        if (now - lastLevelPublish < 200) return
+        lastLevelPublish = now
+        // Speech is roughly 0.005-0.2 RMS; show it on a log-like 0..1 scale.
+        val level = (kotlin.math.ln(1f + rms * 400f) / kotlin.math.ln(81f)).coerceIn(0f, 1f)
+        mainHandler.post {
+            if (!sensing) return@post
+            micLevel = level
+            if (hearingSpeech != inSpeech) {
+                hearingSpeech = inSpeech
+                refreshStatus()
+            }
+            publish()
+        }
+    }
+
+    private fun onUtterance(audio: FloatArray) {
+        mainHandler.post { transcribing = true; refreshStatus(); publish() }
+        // Never drop speech: if the transcriber is busy, utterances wait here and
+        // are transcribed together next (Whisper handles up to 30 s at once).
+        synchronized(waitingAudio) {
+            waitingAudio.add(audio)
+            if (transcribeScheduled) return
+            transcribeScheduled = true
+        }
+        transcriber.execute(::transcribeWaiting)
+    }
+
+    private fun transcribeWaiting() {
+        while (true) {
+            val batch = synchronized(waitingAudio) {
+                if (waitingAudio.isEmpty()) {
+                    transcribeScheduled = false
+                    mainHandler.post {
+                        transcribing = false
+                        refreshStatus()
+                        publish()
+                    }
+                    return
+                }
+                // Take as many waiting utterances as fit in one 25 s window.
+                val taken = ArrayList<FloatArray>()
+                var samples = 0
+                while (waitingAudio.isNotEmpty() && (taken.isEmpty() || samples + waitingAudio.first().size <= MAX_BATCH_SAMPLES)) {
+                    val next = waitingAudio.removeFirst()
+                    taken.add(next)
+                    samples += next.size
+                }
+                taken
+            }
+            val audio = FloatArray(batch.sumOf { it.size })
+            var offset = 0
+            for (part in batch) { part.copyInto(audio, offset); offset += part.size }
+            try {
+                val result = SpeechModel.get(this).transcribe(audio)
+                Log.i("SatarkOverlay", "transcribed ${audio.size / 16} ms audio (${batch.size} utterance(s)): encoder ${result.encoderMs} ms, decoder ${result.decoderMs} ms, ${result.tokens} tokens")
+                if (result.text.isNotBlank()) {
+                    mainHandler.post { onTranscript(result.text) }
+                } else {
+                    mainHandler.post { addHeardLine("(sound heard, but no words could be made out)"); publish() }
+                }
+            } catch (error: Throwable) {
+                Log.w("SatarkOverlay", "transcription failed", error)
+                mainHandler.post { status = "Could not transcribe that part"; render(); publish() }
+            }
+        }
+    }
+
+    private fun onTranscript(text: String) {
+        if (!sensing) return
+        val current = session ?: return
+        transcript = (transcript + "\n" + text).takeLast(MAX_TRANSCRIPT_CHARS).trim()
+        lastHeard = text
+        addHeardLine(text)
+        val result = current.ingest(text)
+        if (result.actionTier > 0) {
+            val previous = alert
+            if (previous == null || result.conversationScore > previous.conversationScore || result.category != previous.category) {
+                alert = result
+                alertExcerpt = transcript.takeLast(400)
+                if (!MainActivity.isInForeground) expanded = true
+            }
+        }
+        render()
+        publish()
+    }
+
+    /** Recomputes the listening status line from the current state. */
+    private fun refreshStatus() {
+        if (!sensing) return
+        status = when {
+            micBlocked && inCall -> "Android mutes the microphone for other apps during a phone call, so Satark cannot hear this call. Listening resumes by itself when the call ends. To check a call, run Satark on a second phone next to the speaker."
+            micBlocked -> "No sound is reaching Satark from the microphone. Another app (call recorder, voice assistant) may be using it. Trying again by itself…"
+            transcribing -> "Converting speech to text on this phone..."
+            hearingSpeech -> "Hearing speech..."
+            else -> "Listening - speak now"
+        }
+    }
+
+    private fun addHeardLine(line: String) {
+        heardLines = (heardLines + line).takeLast(6)
+    }
+
+    /** Current listening state, sent to the app so it can show the live transcript. */
+    private fun stateJson(): JSONObject = JSONObject()
+        .put("listening", sensing)
+        .put("status", status)
+        .put("level", micLevel.toDouble())
+        .put("hearingSpeech", hearingSpeech)
+        .put("transcribing", transcribing)
+        .put("micBlocked", micBlocked)
+        .put("inCall", inCall)
+        .put("lines", JSONArray(heardLines))
+        .put("transcript", transcript)
+        .put("expanded", expanded)
+        .put("alert", alert?.let { alertJson(it) } ?: JSONObject.NULL)
+
+    private fun publish() {
+        val state = stateJson()
+        latestState = state
+        if (BuildConfig.DEBUG) debugState = state
+        SatarkNativePlugin.instance?.notifyListeningUpdate(state)
+    }
+
+    /** @param collapse close the bubble's panel too (not when Stop was pressed in the panel itself). */
+    private fun stopSensing(collapse: Boolean = true) {
+        sensing = false
+        mainHandler.removeCallbacks(micWatchdog)
+        inCall = false
+        blockedSince = 0L
+        capture?.stop()
+        capture = null
+        debugSegmenter = null
+        synchronized(waitingAudio) { waitingAudio.clear() }
+        session = null
+        transcript = ""
+        lastHeard = ""
+        heardLines = emptyList()
+        micLevel = 0f
+        hearingSpeech = false
+        transcribing = false
+        micBlocked = false
+        alert = null
+        status = "Not listening"
+        if (collapse) expanded = false
+        promoteToForeground()
+        render()
+        publish()
+    }
+
+    private fun alertJson(result: SatarkRules.Result): JSONObject = JSONObject().apply {
+        put("action_tier", result.actionTier)
+        put("risk_level", result.riskLevel)
+        put("conversation_score", result.conversationScore)
+        put("category", result.category)
+        put("title", result.title)
+        put("advice", result.advice)
+        put("transcript_excerpt", alertExcerpt)
+        put("indicators", JSONArray().apply {
+            result.indicators.forEach { indicator ->
+                put(JSONObject().put("cluster", indicator.cluster).put("label", indicator.label).put("terms", JSONArray(indicator.terms)))
+            }
+        })
+        put("evidence_indicators", JSONArray(result.indicators.map { it.label }))
+    }
+
+    private fun openDetails() {
+        alert?.let { PendingAlertStore.put(alertJson(it)) }
+        startActivity(Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+        })
+        SatarkNativePlugin.instance?.notifyAlertOpened()
+        expanded = false
+        render()
+    }
+
+    private fun openFullApp() {
+        startActivity(Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        })
+        expanded = false
+        render()
+    }
+
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        if (level >= ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW) {
+            AlertExplainer.release()
+            if (!sensing) SpeechModel.release()
+        }
     }
 
     private fun render() {
@@ -528,25 +549,26 @@ class SatarkOverlayService : Service() {
     }
 
     private fun showOverlay() {
-        if (bubbleView != null) return
+        // Satark's own screen already shows everything; the bubble is only for other apps.
+        if (bubbleView != null || MainActivity.isInForeground || !Settings.canDrawOverlays(this)) return
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
+        val previous = bubbleParams
         bubbleParams = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-            else WindowManager.LayoutParams.TYPE_PHONE,
+            else @Suppress("DEPRECATION") WindowManager.LayoutParams.TYPE_PHONE,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             PixelFormat.TRANSLUCENT
         ).apply {
             gravity = Gravity.TOP or Gravity.END
-            x = 20
-            y = 260
+            // Keep the position the user dragged it to.
+            x = previous?.x ?: 20
+            y = previous?.y ?: 260
         }
-
         val owner = SatarkLifecycleOwner()
         lifecycleOwner = owner
-
         bubbleView = ComposeView(this).also { view ->
             view.setViewTreeLifecycleOwner(owner)
             view.setViewTreeSavedStateRegistryOwner(owner)
@@ -556,31 +578,30 @@ class SatarkOverlayService : Service() {
         }
     }
 
-    private fun openFullApp() {
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-        }
-        startActivity(intent)
-        expanded = false
-        render()
+    /** Removes the bubble window (it is rebuilt by [showOverlay]). */
+    private fun hideOverlay() {
+        bubbleView?.let { view -> if (::windowManager.isInitialized) windowManager.removeView(view) }
+        bubbleView = null
+        lifecycleOwner?.destroy()
+        lifecycleOwner = null
     }
 
     @Composable
     private fun OverlayContent() {
         MaterialTheme {
-            if (!expanded && warning == null) {
-                // Circular Assistive Touch Shield Bubble (~54dp)
+            if (!expanded) {
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .size(54.dp)
-                        .background(
-                            color = if (sensing) Color(0xFF0F172A) else Color(0xFF0A0F1D),
-                            shape = CircleShape
-                        )
+                        .background(color = if (sensing) Color(0xFFFFFFFF) else Color(0xFFFFFFFF), shape = CircleShape)
                         .border(
                             width = 2.dp,
-                            color = if (sensing) Color(0xFF34D399) else Color(0xFF38BDF8),
+                            color = when {
+                                alert != null -> Color(0xFFB45309)
+                                sensing -> Color(0xFF047857)
+                                else -> Color(0xFF1D4ED8)
+                            },
                             shape = CircleShape
                         )
                         .pointerInput(Unit) {
@@ -594,180 +615,162 @@ class SatarkOverlayService : Service() {
                             }
                         }
                 ) {
-                    IconButton(
-                        onClick = { expanded = true; render() },
-                        modifier = Modifier.size(48.dp)
-                    ) {
+                    IconButton(onClick = { expanded = true; render() }, modifier = Modifier.size(48.dp)) {
                         Icon(
-                            imageVector = Icons.Default.Shield,
-                            contentDescription = "SATARK Shield Floating Controls",
-                            tint = if (sensing) Color(0xFF34D399) else Color(0xFF38BDF8),
+                            imageVector = if (alert != null) Icons.Default.Warning else Icons.Default.Shield,
+                            contentDescription = "Satark floating controls",
+                            tint = when {
+                                alert != null -> Color(0xFFB45309)
+                                sensing -> Color(0xFF047857)
+                                else -> Color(0xFF1D4ED8)
+                            },
                             modifier = Modifier.size(28.dp)
                         )
                     }
                 }
             } else {
-                // Compact Floating Panel Overlay
                 Surface(
-                    modifier = Modifier
-                        .fillMaxWidth(0.92f)
-                        .padding(6.dp),
+                    modifier = Modifier.fillMaxWidth(0.92f).padding(6.dp),
                     shape = RoundedCornerShape(20.dp),
-                    color = Color(0xFF0F172A),
-                    contentColor = Color.White,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF38BDF8).copy(alpha = 0.4f)),
+                    color = Color(0xFFFFFFFF),
+                    contentColor = Color(0xFF111827),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE3E6EB)),
                     shadowElevation = 16.dp
                 ) {
+                    // Never taller than ~75% of the screen; scrolls if the content is longer.
+                    val maxHeight = (LocalConfiguration.current.screenHeightDp * 0.75f).dp
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier
+                            .heightIn(max = maxHeight)
+                            .verticalScroll(rememberScrollState())
+                            .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        // Header Row
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Shield,
-                                    contentDescription = null,
-                                    tint = Color(0xFF38BDF8),
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Text(
-                                    text = "SATARK | सतर्क",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = Color.White
-                                )
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Icon(Icons.Default.Shield, contentDescription = null, tint = Color(0xFF1D4ED8), modifier = Modifier.size(24.dp))
+                                Text(text = "SATARK | सतर्क", style = MaterialTheme.typography.titleMedium, color = Color(0xFF111827))
                             }
-                            IconButton(onClick = { warning = null; expanded = false; render() }) {
-                                Icon(
-                                    imageVector = Icons.Default.Close,
-                                    contentDescription = "Minimize Panel",
-                                    tint = Color(0xFF94A3B8)
-                                )
+                            IconButton(onClick = { expanded = false; render() }) {
+                                Icon(Icons.Default.Close, contentDescription = "Minimise", tint = Color(0xFF5B6474))
                             }
                         }
 
-                        // Suspicious Call Warning Card (if warning != null)
-                        warning?.let { current ->
+                        // Controls first, so they are always reachable.
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            if (!sensing) {
+                                Button(
+                                    onClick = { startSensing() },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1D4ED8)),
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Icon(Icons.Default.Mic, contentDescription = null, modifier = Modifier.size(16.dp))
+                                    Text(" Start listening", fontSize = 12.sp)
+                                }
+                            } else {
+                                Button(
+                                    onClick = { stopSensing(collapse = false) },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC62828)),
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Icon(Icons.Default.Stop, contentDescription = null, modifier = Modifier.size(16.dp))
+                                    Text(" Stop", fontSize = 12.sp)
+                                }
+                            }
+                            TextButton(onClick = { openFullApp() }) {
+                                Icon(Icons.Default.OpenInNew, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Text(" Open app", fontSize = 12.sp, color = Color(0xFF1D4ED8))
+                            }
+                        }
+
+                        alert?.let { current ->
+                            val high = current.riskLevel == "high"
                             Surface(
                                 shape = RoundedCornerShape(14.dp),
-                                color = if (current.level == "High") Color(0x33EF4444) else Color(0x33F59E0B),
-                                border = androidx.compose.foundation.BorderStroke(
-                                    1.dp,
-                                    if (current.level == "High") Color(0xFFEF4444) else Color(0xFFF59E0B)
-                                ),
+                                color = if (high) Color(0xFFFDECEC) else Color(0xFFFFF4E0),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, if (high) Color(0xFFC62828) else Color(0xFFB45309)),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                        Icon(
-                                            Icons.Default.Warning,
-                                            contentDescription = null,
-                                            tint = if (current.level == "High") Color(0xFFF87171) else Color(0xFFFBBF24)
-                                        )
+                                        Icon(Icons.Default.Warning, contentDescription = null, tint = if (high) Color(0xFFC62828) else Color(0xFFB45309))
                                         Text(
-                                            text = if (current.level == "High") "POSSIBLE SCAM DETECTED" else "CAUTION REQUIRED",
-                                            color = if (current.level == "High") Color(0xFFF87171) else Color(0xFFFBBF24),
+                                            text = current.title ?: "Verify this call",
+                                            color = if (high) Color(0xFFC62828) else Color(0xFFB45309),
                                             fontSize = 14.sp,
                                             style = MaterialTheme.typography.titleSmall
                                         )
                                     }
-                                    Text(text = current.explanation, fontSize = 12.sp, color = Color(0xFFE2E8F0))
+                                    current.advice?.let { Text(text = it, fontSize = 12.sp, color = Color(0xFF111827)) }
                                     Text(
-                                        text = "“${current.excerpt}”",
+                                        text = "Heard: " + current.indicators.joinToString("; ") { it.label },
                                         fontSize = 11.sp,
-                                        color = Color(0xFF94A3B8),
-                                        modifier = Modifier
-                                            .background(Color(0x22FFFFFF), RoundedCornerShape(6.dp))
-                                            .padding(6.dp)
+                                        color = Color(0xFF374151)
                                     )
-                                    current.location?.let {
-                                        Text(text = "Detected location: $it", fontSize = 12.sp, color = Color(0xFF67E8F9))
-                                    }
-                                    current.places.forEach { place ->
-                                        Surface(
-                                            shape = RoundedCornerShape(8.dp),
-                                            color = Color(0xFF1E293B),
-                                            modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
-                                        ) {
-                                            Column(modifier = Modifier.padding(8.dp)) {
-                                                Text(place.name, style = MaterialTheme.typography.titleSmall, fontSize = 12.sp, color = Color.White)
-                                                if (place.address.isNotBlank()) Text(place.address, fontSize = 11.sp, color = Color(0xFFCBD5E1))
-                                                if (place.phone.isNotBlank()) {
-                                                    TextButton(
-                                                        onClick = {
-                                                            startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:${place.phone}")))
-                                                        },
-                                                        modifier = Modifier.padding(top = 2.dp)
-                                                    ) {
-                                                        Icon(Icons.Default.Call, contentDescription = null, modifier = Modifier.size(14.dp))
-                                                        Text(" Call Official: ${place.phone}", fontSize = 11.sp, color = Color(0xFF38BDF8))
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
                                     Text(
-                                        text = "Verify independently before sending money.",
+                                        text = "“…${alertExcerpt.replace('\n', ' ').takeLast(110)}”",
                                         fontSize = 11.sp,
-                                        color = Color(0xFFFBBF24),
-                                        modifier = Modifier.padding(top = 4.dp)
+                                        color = Color(0xFF5B6474),
+                                        modifier = Modifier.background(Color(0xFFF1F3F6), RoundedCornerShape(6.dp)).padding(6.dp)
                                     )
-                                }
-                            }
-                        } ?: run {
-                            // Normal Controls Panel
-                            Text(
-                                text = "Backend: $API_BASE_URL",
-                                fontSize = 11.sp,
-                                color = Color(0xFF67E8F9)
-                            )
-                            Text(
-                                text = "Status: $status",
-                                fontSize = 13.sp,
-                                color = if (sensing) Color(0xFF34D399) else Color(0xFFFBBF24)
-                            )
-                            Text(
-                                text = "Note: Uses device microphone only. Android restricts third-party app access to remote cellular/WhatsApp call audio.",
-                                fontSize = 10.sp,
-                                color = Color(0xFF94A3B8),
-                                lineHeight = 14.sp
-                            )
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                if (!sensing) {
+                                    Text(
+                                        text = "This is advice, not proof. Satark never blocks payments.",
+                                        fontSize = 10.sp,
+                                        color = Color(0xFF5B6474)
+                                    )
                                     Button(
-                                        onClick = { startSensing() },
-                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
-                                        modifier = Modifier.weight(1f)
+                                        onClick = { openDetails() },
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1D4ED8)),
+                                        modifier = Modifier.fillMaxWidth()
                                     ) {
-                                        Icon(Icons.Default.Mic, contentDescription = null, modifier = Modifier.size(16.dp))
-                                        Text(" Start Sensing", fontSize = 12.sp)
+                                        Icon(Icons.Default.OpenInNew, contentDescription = null, modifier = Modifier.size(14.dp))
+                                        Text(" Details & nearby help", fontSize = 12.sp)
                                     }
-                                } else {
-                                    Button(
-                                        onClick = { stopSensing() },
-                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444)),
-                                        modifier = Modifier.weight(1f)
-                                    ) {
-                                        Icon(Icons.Default.Stop, contentDescription = null, modifier = Modifier.size(16.dp))
-                                        Text(" Stop Sensing", fontSize = 12.sp)
+                                    TextButton(onClick = { alert = null; render(); publish() }, modifier = Modifier.fillMaxWidth()) {
+                                        Text("Dismiss", fontSize = 12.sp, color = Color(0xFF5B6474))
                                     }
-                                }
-                                TextButton(onClick = { openFullApp() }) {
-                                    Icon(Icons.Default.OpenInNew, contentDescription = null, modifier = Modifier.size(16.dp))
-                                    Text(" Open App", fontSize = 12.sp, color = Color(0xFF38BDF8))
                                 }
                             }
                         }
+
+                        Text(text = "Status: $status", fontSize = 13.sp, color = if (sensing) Color(0xFF047857) else Color(0xFFB45309))
+                        if (sensing) {
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Icon(Icons.Default.Mic, contentDescription = null, tint = if (hearingSpeech) Color(0xFF047857) else Color(0xFF5B6474), modifier = Modifier.size(16.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(8.dp)
+                                        .background(Color(0xFFF1F3F6), RoundedCornerShape(4.dp))
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth(micLevel.coerceIn(0.02f, 1f))
+                                            .height(8.dp)
+                                            .background(if (hearingSpeech) Color(0xFF047857) else Color(0xFF1D4ED8), RoundedCornerShape(4.dp))
+                                    )
+                                }
+                            }
+                            Text(text = "What Satark heard:", fontSize = 11.sp, color = Color(0xFF5B6474))
+                            if (heardLines.isEmpty()) {
+                                Text(text = "Nothing yet - speak and pause; text appears a moment after each sentence.", fontSize = 12.sp, color = Color(0xFF8A93A3))
+                            } else {
+                                heardLines.takeLast(2).forEach { line ->
+                                    Text(text = "\u201C$line\u201D", fontSize = 12.sp, color = Color(0xFF111827))
+                                }
+                            }
+                        }
+                        Text(
+                            text = "Speech is transcribed on this phone (Hindi · English · Hinglish) and never uploaded. " +
+                                "Microphone only — the other side of SIM/WhatsApp calls is heard only on speaker.",
+                            fontSize = 10.sp,
+                            color = Color(0xFF5B6474),
+                            lineHeight = 14.sp
+                        )
                     }
                 }
             }
@@ -777,9 +780,7 @@ class SatarkOverlayService : Service() {
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             getSystemService(NotificationManager::class.java)
-                ?.createNotificationChannel(
-                    NotificationChannel(CHANNEL_ID, "Satark overlay", NotificationManager.IMPORTANCE_LOW)
-                )
+                ?.createNotificationChannel(NotificationChannel(CHANNEL_ID, "Satark overlay", NotificationManager.IMPORTANCE_LOW))
         }
     }
 
@@ -790,10 +791,10 @@ class SatarkOverlayService : Service() {
         )
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_alert)
-            .setContentTitle(if (sensing) "SATARK microphone sensing active" else "SATARK is ready")
+            .setContentTitle(if (sensing) "Satark is listening (on-device)" else "Satark is ready")
             .setContentText(
-                if (sensing) "Device microphone only; remote call audio is unavailable."
-                else "Tap the floating shield to start or stop sensing."
+                if (sensing) "Microphone audio is transcribed on this phone and discarded. Tap the bubble to stop."
+                else "Tap the floating shield to start listening."
             )
             .setContentIntent(pendingIntent)
             .setOngoing(true)
@@ -801,13 +802,14 @@ class SatarkOverlayService : Service() {
     }
 
     override fun onDestroy() {
+        instance = null
+        isRunning = false
         sensing = false
-        recognizer?.destroy()
-        executor.shutdownNow()
-        bubbleView?.let { if (::windowManager.isInitialized) windowManager.removeView(it) }
-        bubbleView = null
-        lifecycleOwner?.destroy()
-        lifecycleOwner = null
+        isListening = false
+        capture?.stop()
+        transcriber.shutdownNow()
+        hideOverlay()
+        SpeechModel.release()
         super.onDestroy()
     }
 

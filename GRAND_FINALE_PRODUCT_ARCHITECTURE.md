@@ -1,5 +1,7 @@
 # Satark (सतर्क) · Grand Finale Product Architecture & Competitive Benchmark
 
+> **Superseded (v2.0):** Azure Maps and the app-to-backend transcript flow described here were removed for hackathon compliance. Current design: `docs/12_OFFLINE_AI_AND_FREE_SERVICES.md`.
+
 > **Pre-Payment Scam Shield for UPI & Real-Time Multimodal Voice Interception**  
 > *Developed for Raksham PS02 Grand Finale*  
 > *Compliant with: DPDP Act 2023, BNSS Section 106, RBI FREE-AI Ethical AI Framework, and I4C 1930 Cybercrime Reporting APIs.*

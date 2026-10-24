@@ -2,14 +2,15 @@
   "appId": "in.satark.shield",
   "appName": "Satark",
   "webDir": "dist",
-  "bundledWebRuntime": false,
+  "appendUserAgent": "Satark/2.0 (in.satark.shield)",
   "server": {
-    "androidScheme": "http"
+    "androidScheme": "https"
   },
-  "android": {
-    "buildOptions": {
-      "keystorePath": "",
-      "keystoreAlias": ""
+  "plugins": {
+    "SystemBars": {
+      "style": "LIGHT",
+      "insetsHandling": "css"
     }
-  }
+  },
+  "backgroundColor": "#f5f6f8"
 }

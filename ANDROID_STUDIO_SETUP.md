@@ -51,21 +51,19 @@ android\app\build\outputs\apk\debug\app-debug.apk
 3. Open another app.
 4. Confirm that the shield remains visible.
 5. Tap it and verify the Start Sensing/Stop Sensing controls.
-6. Provide consented speech and verify that only analyzer-backed warnings expand the panel.
+6. Provide consented speech and verify that only rule-based warnings expand the panel.
 7. Use **Stop Sensing** to return to the bubble.
 
-## Backend connectivity
+## No backend needed
 
-The browser development proxy does not apply to a packaged APK. The emulator
-uses a configurable backend URL for the local FastAPI server. The default
-`10.0.2.2:8000` value is emulator-only; a physical phone needs a
-reachable HTTPS URL configured in `SatarkOverlayService.kt`; `127.0.0.1`
-inside the phone means the phone itself, not the development computer.
+The APK does not call any backend. Speech recognition, scam rules and the
+optional language model run on the phone; nearby search calls free
+OpenStreetMap services directly. See `docs/12_OFFLINE_AI_AND_FREE_SERVICES.md`.
 
 ## Security and privacy
 
 - Request overlay and microphone permissions only when needed.
 - Explain consent before speech analysis.
 - Do not describe the overlay as GSM call recording.
-- Do not embed Azure keys in the APK.
-- Use HTTPS/WSS for production backend traffic.
+- No API keys are used or embedded in the APK.
+- Audio and transcripts stay on the device.

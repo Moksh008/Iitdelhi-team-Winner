@@ -1,6 +1,6 @@
 # Satark Server (FastAPI Microservice Backend)
 
-This is the production backend for **Project Satark (सतर्क)**, built with FastAPI, PyTorch, and Uvicorn.
+This is an **optional development and test server** for Project Satark (सतर्क), built with FastAPI. Since v2.0 the Android app and web UI do not call it: analysis runs on the device (see `docs/12_OFFLINE_AI_AND_FREE_SERVICES.md`). It uses no paid services or API keys.
 
 ---
 
@@ -35,10 +35,8 @@ and select that repository. Render will create the `satark-backend` web service
 and deploy this directory.
 
 After deployment, verify `https://<your-service>.onrender.com/api/v1/health`;
-interactive API documentation is at `/docs`. If place search should use Azure
-Maps, add `AZURE_MAPS_KEY` as a secret environment variable in the Render
-service settings. Without it, place search returns its configured
-not-available response.
+interactive API documentation is at `/docs`. No environment variables or keys
+are required. (Azure Maps place search was removed; the app uses OpenStreetMap.)
 
 This deployment installs only the FastAPI backend dependencies. The optional
 PyTorch model in the sibling `model/` directory is not included in the Render

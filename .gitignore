@@ -106,3 +106,14 @@ app/src/main/res/xml/config.xml
 
 
 .env/
+# Generated on-device model assets (run tools/models/export_whisper_onnx.py)
+android/app/src/main/assets/whisper/
+# Python caches
+__pycache__/
+*.pyc
+
+# Dependencies (install with npm install)
+node_modules/
+
+# Intel feed signing key (never commit)
+tools/keys/
