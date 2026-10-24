@@ -57,7 +57,6 @@ The app does not place calls automatically, send money, or embed Azure secrets.
 3. [Android setup](docs/03_ANDROID_SETUP_AND_PERMISSIONS.md)
 4. [Architecture](docs/04_ARCHITECTURE_AND_FOLDER_STRUCTURE.md)
 5. [AI and transcript pipeline](docs/05_LOCAL_AI_AND_TRANSCRIPT_PIPELINE.md)
-6. [Azure Maps](docs/06_AZURE_MAPS_SETUP_AND_API.md)
 7. [Cache and privacy](docs/07_DATABASE_CACHE_AND_PRIVACY.md)
 8. [Verification and dialer](docs/08_VERIFICATION_PANEL_AND_DIALER.md)
 9. [Testing](docs/09_TESTING_AND_ACCEPTANCE.md)
