@@ -86,7 +86,7 @@ public class SatarkNativePlugin extends Plugin {
     public void getApiBaseUrl(PluginCall call) {
         String baseUrl = BuildConfig.SATARK_API_BASE_URL;
         if (baseUrl == null || baseUrl.trim().isEmpty()) {
-            baseUrl = "https://satark-backend-sf2b.onrender.com";
+            baseUrl = "http://10.0.2.2:8000";
         }
         call.resolve(new JSObject().put("baseUrl", baseUrl));
     }

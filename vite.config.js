@@ -8,11 +8,11 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api': {
-        target: 'https://satark-backend-sf2b.onrender.com',
+        target: 'http://127.0.0.1:8000',
         changeOrigin: true
       },
       '/ws': {
-        target: 'wss://satark-backend-sf2b.onrender.com',
+        target: 'ws://127.0.0.1:8000',
         ws: true,
         changeOrigin: true
       }

@@ -23,18 +23,36 @@ def predict_chunk(text, model_dir="model/saved_model"):
     base_dir = os.path.dirname(os.path.abspath(__file__))
     saved_model_path = os.path.join(base_dir, "saved_model")
     
+    has_weights = os.path.isdir(saved_model_path) and any(
+        os.path.isfile(os.path.join(saved_model_path, f))
+        for f in ["model.safetensors", "pytorch_model.bin"]
+    )
+    
     if _model is None:
         _device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        if os.path.exists(saved_model_path):
-            _tokenizer = AutoTokenizer.from_pretrained(saved_model_path)
-            _model = AutoModelForSequenceClassification.from_pretrained(saved_model_path)
-        else:
-            print("Notice: Using pretrained base multilingual architecture...")
-            model_name = "distilbert-base-multilingual-cased"
-            _tokenizer = AutoTokenizer.from_pretrained(model_name)
-            _model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=2)
-        _model.to(_device)
-        _model.eval()
+        try:
+            if has_weights:
+                _tokenizer = AutoTokenizer.from_pretrained(saved_model_path)
+                _model = AutoModelForSequenceClassification.from_pretrained(saved_model_path)
+            else:
+                print("Notice: Using pretrained base multilingual architecture...")
+                model_name = "distilbert-base-multilingual-cased"
+                _tokenizer = AutoTokenizer.from_pretrained(model_name)
+                _model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=2)
+            _model.to(_device)
+            _model.eval()
+        except Exception as e:
+            print(f"Warning: Could not load transformer model: {e}")
+            _model = False
+
+    if not _model or _tokenizer is None:
+        return {
+            "text": text,
+            "scam_probability": 0.0,
+            "is_threat": False,
+            "action_tier": 0,
+            "status": "SAFE (Fallback)"
+        }
 
     inputs = _tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=128).to(_device)
     with torch.no_grad():

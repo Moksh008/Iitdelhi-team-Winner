@@ -21,6 +21,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
   </head>
   <body>
+    <script>
+      window.Capacitor = window.Capacitor || {
+        isNativePlatform: () => false,
+        triggerEvent: (eventName, target, eventData) => {
+          const event = new CustomEvent(eventName, { detail: eventData });
+          document.dispatchEvent(event);
+          return true;
+        }
+      };
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

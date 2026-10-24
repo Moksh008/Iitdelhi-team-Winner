@@ -15,7 +15,7 @@ android {
         versionCode 2
         versionName "1.1"
         def rawApiBaseUrl = project.findProperty('SATARK_API_BASE_URL')?.toString()?.trim()
-        def satarkApiBaseUrl = (rawApiBaseUrl && rawApiBaseUrl.length() > 0) ? rawApiBaseUrl : 'https://satark-backend-sf2b.onrender.com'
+        def satarkApiBaseUrl = (rawApiBaseUrl && rawApiBaseUrl.length() > 0) ? rawApiBaseUrl : 'http://10.0.2.2:8000'
         buildConfigField "String", "SATARK_API_BASE_URL", "\"${satarkApiBaseUrl}\""
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {

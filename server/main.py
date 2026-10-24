@@ -197,7 +197,7 @@ def analyze_transcript_chunk(req: TranscriptChunkRequest):
     if inference_fn is not None:
         try:
             score = float(inference_fn(scrubbed)["scam_probability"])
-        except (KeyError, TypeError, ValueError, RuntimeError):
+        except Exception:
             score = 0.0
     claim = resolve_claim(scrubbed)
     if claim["recommended_action"] == "VERIFY_BEFORE_PAYMENT":

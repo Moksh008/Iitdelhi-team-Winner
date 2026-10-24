@@ -28,6 +28,7 @@ export default function NativeFirstHome() {
   const recognitionRef = useRef(null);
   const speechTranscriptRef = useRef('');
   const sensingRef = useRef(false);
+  const lastErrorRef = useRef(null); // tracks last fatal error so onend skips restart
   const requestsRef = useRef(new Set());
   const sequenceRef = useRef(0);
   const analysisRequestRef = useRef(null);
@@ -52,17 +53,17 @@ export default function NativeFirstHome() {
       SatarkNative.getApiBaseUrl()
         .then((result) => {
           const rawUrl = result?.baseUrl?.trim();
-          const resolved = (rawUrl && rawUrl.length > 0) ? rawUrl : (import.meta.env.VITE_SATARK_API_BASE_URL || 'https://satark-backend-sf2b.onrender.com');
+          const resolved = (rawUrl && rawUrl.length > 0) ? rawUrl : (import.meta.env.VITE_SATARK_API_BASE_URL || 'http://10.0.2.2:8000');
           console.info('[SATARK diagnostic] Resolved native API base URL:', resolved);
           if (isMounted) setApiBaseUrl(resolved);
         })
         .catch((error) => {
-          const fallback = import.meta.env.VITE_SATARK_API_BASE_URL || 'https://satark-backend-sf2b.onrender.com';
+          const fallback = import.meta.env.VITE_SATARK_API_BASE_URL || 'http://10.0.2.2:8000';
           console.warn('[SATARK diagnostic] getApiBaseUrl call failed:', error, 'Using fallback:', fallback);
           if (isMounted) setApiBaseUrl(fallback);
         });
     } else {
-      const resolved = import.meta.env.VITE_SATARK_API_BASE_URL || 'https://satark-backend-sf2b.onrender.com';
+      const resolved = import.meta.env.VITE_SATARK_API_BASE_URL || 'http://10.0.2.2:8000';
       console.info('[SATARK diagnostic] Resolved web API base URL:', resolved);
       if (isMounted) setApiBaseUrl(resolved);
     }
@@ -151,15 +152,20 @@ export default function NativeFirstHome() {
       recognition.interimResults = false;
       recognition.maxAlternatives = 1;
       sensingRef.current = true;
+      lastErrorRef.current = null;
       speechTranscriptRef.current = '';
       setRecognizedTranscript('');
       setSensing(true);
       setAnalysisError('');
       setStatus(`Requesting microphone access (${selectedLanguage?.name || 'system language'} speech hint)…`);
 
+      // Fatal errors that should permanently stop sensing
+      const FATAL_ERRORS = ['not-allowed', 'service-not-allowed', 'audio-capture', 'language-not-supported', 'network'];
+
       recognition.onstart = () => {
         if (sensingRef.current) {
-          setStatus(`Microphone active · ${selectedLanguage?.name || 'system language'} · nearby speech only`);
+          lastErrorRef.current = null; // Clear error on successful (re)start
+          setStatus(`Microphone active · ${selectedLanguage?.name || 'system language'} · speak now`);
         }
       };
       recognition.onresult = (event) => {
@@ -182,25 +188,38 @@ export default function NativeFirstHome() {
         void analyzeTranscript(speechTranscriptRef.current, language);
       };
       recognition.onerror = (event) => {
+        // 'aborted' fires when we call .stop() ourselves — not a real error
         if (!sensingRef.current || event.error === 'aborted') return;
+
+        lastErrorRef.current = event.error;
+
+        if (event.error === 'no-speech') {
+          // Non-fatal: browser timed out waiting for speech. onend will restart it.
+          setStatus(`Microphone active · ${selectedLanguage?.name || 'system language'} · listening…`);
+          return;
+        }
+
         const messages = {
-          'not-allowed': 'Microphone permission was denied. Allow microphone access in browser settings, then try again.',
+          'not-allowed': 'Microphone permission was denied. Allow microphone access in browser/app settings, then try again.',
           'service-not-allowed': 'The browser speech service is blocked. Use manual transcript input or another supported browser.',
           'audio-capture': 'No usable microphone was found. Check the microphone and try again.',
-          'language-not-supported': `${selectedLanguage?.name || 'Selected language'} is not supported by this browser speech service. Choose another language or use manual input.`,
+          'language-not-supported': `${selectedLanguage?.name || 'Selected language'} is not supported by this browser speech service. Try "Auto detect" or use manual input.`,
           network: 'Browser speech recognition needs a working network connection. Manual transcript input is still available.',
-          'no-speech': 'No speech was detected yet. Keep the microphone active or enter a transcript manually.'
         };
         const message = messages[event.error] || `Speech recognition stopped (${event.error}). You can still analyze a manual transcript.`;
         setStatus(message);
-        if (['not-allowed', 'service-not-allowed', 'audio-capture', 'language-not-supported', 'network'].includes(event.error)) {
+
+        if (FATAL_ERRORS.includes(event.error)) {
+          // Fatal: stop sensing entirely — onend must NOT restart
           sensingRef.current = false;
-          setSensing(false);
           recognitionRef.current = null;
+          setSensing(false);
         }
       };
       recognition.onend = () => {
+        // Don't restart if: we stopped intentionally, wrong instance, or a fatal error occurred
         if (!sensingRef.current || recognitionRef.current !== recognition) return;
+        if (lastErrorRef.current && FATAL_ERRORS.includes(lastErrorRef.current)) return;
         window.setTimeout(() => {
           if (!sensingRef.current || recognitionRef.current !== recognition) return;
           try {
@@ -211,13 +230,14 @@ export default function NativeFirstHome() {
             setSensing(false);
             setStatus(`Could not restart speech recognition: ${error.message || 'try again'}.`);
           }
-        }, 400);
+        }, 300);
       };
       recognitionRef.current = recognition;
       try {
         recognition.start();
       } catch (error) {
         sensingRef.current = false;
+        lastErrorRef.current = 'start-failed';
         recognitionRef.current = null;
         setSensing(false);
         setStatus(`Could not start microphone recognition: ${error.message || 'check browser permissions'}.`);

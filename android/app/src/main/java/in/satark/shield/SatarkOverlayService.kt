@@ -115,7 +115,7 @@ class SatarkOverlayService : Service() {
         const val EXTRA_AUTO_LANGUAGE_DETECTION = "auto_language_detection"
         private const val CHANNEL_ID = "satark_overlay"
         private const val NOTIFICATION_ID = 4242
-        private val API_BASE_URL = (if (BuildConfig.SATARK_API_BASE_URL.isNotBlank()) BuildConfig.SATARK_API_BASE_URL else "https://satark-backend-sf2b.onrender.com").trimEnd('/')
+        private val API_BASE_URL = (if (BuildConfig.SATARK_API_BASE_URL.isNotBlank()) BuildConfig.SATARK_API_BASE_URL else "http://10.0.2.2:8000").trimEnd('/')
     }
 
     private data class Place(
