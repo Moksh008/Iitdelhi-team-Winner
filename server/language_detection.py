@@ -1,6 +1,6 @@
 import re
 
-
+ 
 def detect_transcript_language(text: str) -> str:
     """Best-effort language identification from script and common Hinglish words."""
     if re.search(r"[\u0a80-\u0aff]", text):
