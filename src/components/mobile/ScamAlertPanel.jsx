@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, Cpu, MapPin, Phone, ShieldCheck } from 'lucide-react';
+import { AlertTriangle, Cpu, Lock, MapPin, Phone, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { extractLocation, findCity } from '../../engine/locationExtractor';
+import { findTriggerStatement } from '../../engine/localAnalyzer';
 import { SatarkNative, isNativeApp } from '../../native/satarkNative';
 import NearbyHelpPanel from './NearbyHelpPanel';
 
@@ -33,14 +34,25 @@ const AI_STATUS_TEXT = {
  * Full warning page for an alert raised by the on-device rules. Nothing here
  * blocks a payment or contacts anyone; every action is the user's choice.
  */
-export default function ScamAlertPanel({ alert, onClose }) {
+export default function ScamAlertPanel({ alert, onClose, onEmergency }) {
   const [aiNote, setAiNote] = useState({ status: isNativeApp ? 'loading' : 'unavailable' });
+  const [lockNote, setLockNote] = useState('');
+  const lockRemoteAccess = async () => {
+    const result = await SatarkNative.lockRemoteAccess({ minutes: 30 }).catch(() => null);
+    setLockNote({
+      locked: 'Screen-sharing apps are cut off from the internet for 30 minutes (Protect tab to unlock).',
+      needs_shield: 'Turn on scam link blocking in the Protect tab once, then tap again.',
+      no_apps: 'No screen-sharing app is installed on this phone.',
+    }[result?.status] || 'Could not lock screen-sharing apps.');
+  };
   const location = useMemo(() => extractLocation(alert?.transcript_excerpt || ''), [alert]);
   const cityFallback = useMemo(() => {
     const city = findCity(alert?.transcript_excerpt || '');
     return city ? [city.name] : [];
   }, [alert]);
   const high = alert?.risk_level === 'high';
+  // The statement that raised the warning (the phone sends it; otherwise find it in the transcript).
+  const trigger = useMemo(() => alert?.trigger || findTriggerStatement(alert?.transcript_excerpt || ''), [alert]);
 
   useEffect(() => {
     let cancelled = false;
@@ -71,13 +83,31 @@ export default function ScamAlertPanel({ alert, onClose }) {
         </div>
         <h2>{alert.title || 'Verify this call independently'}</h2>
         <p>{alert.advice || 'These signs are not proof of fraud. Do not send money based only on an urgent claim.'}</p>
+        {trigger && <p className="trigger-line" id="alert-trigger">Triggered by: “{trigger}”</p>}
         <p className="fine-print">This is advice, not proof. Satark never blocks a payment or calls anyone for you.</p>
       </section>
+
+      <button type="button" className="btn btn-danger btn-block" onClick={onEmergency} id="btn-alert-checklist">
+        <ShieldAlert size={16} /> Safety steps
+      </button>
 
       <div className="btn-row">
         <a className="btn btn-secondary" href="tel:1930" id="btn-alert-call-1930"><Phone size={16} /> Call 1930</a>
         <button type="button" className="btn btn-primary" onClick={onClose} id="btn-alert-done">Done</button>
       </div>
+
+      {isNativeApp && (
+        <section className="card" id="alert-remote-lock">
+          <button type="button" className="btn btn-danger btn-block" onClick={lockRemoteAccess} id="btn-alert-lock">
+            <Lock size={16} /> Cut off screen-sharing apps
+          </button>
+          <p className="fine-print">
+            Routes AnyDesk, TeamViewer and similar apps into Satark’s VPN and drops their traffic, which stops most sessions. To be sure,
+            also force-stop or uninstall the app (see Safety steps).
+          </p>
+          {lockNote && <p className="notice" role="status">{lockNote}</p>}
+        </section>
+      )}
 
       <section className="card">
         <h2>Why Satark warned you</h2>
@@ -110,7 +140,7 @@ export default function ScamAlertPanel({ alert, onClose }) {
             name is sent). Edit it below if it was misheard.
           </p>
         ) : (
-          <p className="muted">No place was mentioned. Type one or use your location.</p>
+          <p className="muted">No place was mentioned in the call. Type the area, landmark or city the caller named.</p>
         )}
         <NearbyHelpPanel
           key={location?.text || 'none'}

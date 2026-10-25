@@ -6,15 +6,15 @@ directly from the app (`src/services/osmPlaces.js`, `NearbyHelpPanel.jsx`,
 
 * **Nominatim** turns a typed place into coordinates (India only, one result,
   at most one request per second, no autocomplete, cached for 7 days).
-* **Overpass API** finds named places of one category within 1, 3, 5 or 10 km
-  (three public instances tried in turn, 12 s timeout each, cached for 24 h).
+* **Overpass API** finds named places of one category within 1, 3, 5, 10 or 20 km
+  (three public instances asked together, first answer wins, 10 s timeout,
+  cached for 24 h). When nothing is mapped within the chosen radius, the search
+  widens step by step up to 20 km and says so.
   When all are unavailable, the app pauses Overpass for 5 minutes and uses
   Nominatim's bounded category search instead, with a note that results may be
   less complete.
-* **Leaflet + tile.openstreetmap.org** draws the map with the required
-  "© OpenStreetMap contributors" attribution. The list works without the map.
-* **GPS** (`@capacitor/geolocation`, coarse) is requested only when the user taps
-  "Use my location". Typing a place always works.
+* No map is drawn and the phone's GPS is never used (location permissions are
+  removed from the manifest): the place comes from the call or is typed.
 
 **Automatic search from the call:** when an alert opens, `locationExtractor.js`
 looks in the transcript for a place (landmarks with "near/at/opposite", Hinglish

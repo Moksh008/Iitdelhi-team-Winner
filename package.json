@@ -1,6 +1,6 @@
 {
   "name": "satark",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "Satark: on-device, consent-based pre-payment scam shield",
   "type": "module",
   "scripts": {

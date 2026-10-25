@@ -149,5 +149,46 @@ export function analyzeText(text) {
   return new LocalScamSession().ingest(text);
 }
 
+/** The words around the last place a term was said, e.g. "…please share the otp you just…". */
+function contextOf(words, compiled, span = 5) {
+  for (let i = words.length - 1; i >= 0; i -= 1) {
+    if (!matchesAt(words, i, compiled)) continue;
+    const start = Math.max(0, i - span);
+    const end = Math.min(words.length, i + compiled.words.length + span);
+    return `${start > 0 ? '…' : ''}${words.slice(start, end).join(' ')}${end < words.length ? '…' : ''}`;
+  }
+  return '';
+}
+
+/**
+ * Critical cues: clusters strong enough to raise an alert on their own
+ * (e.g. OTP/PIN, "safe account", AnyDesk). Returns [{ cluster, label, terms, context }].
+ */
+export function findCriticalCues(text) {
+  const words = normalizeWords(text);
+  return Object.entries(matchClusters(text))
+    .filter(([name]) => (CLUSTERS[name]?.solo ?? 0) >= lexicon.nudge_threshold)
+    .map(([name, terms]) => {
+      const compiled = CLUSTERS[name].compiled.find(item => item.term === terms[0]);
+      return { cluster: name, label: CLUSTERS[name].label, terms: terms.slice(0, 4), context: contextOf(words, compiled) };
+    });
+}
+
+/**
+ * The statement that most likely triggered a warning: the sentence (or line)
+ * with the strongest scam signs. Returns '' when no sentence has any.
+ */
+export function findTriggerStatement(text) {
+  let best = { score: 0, sentence: '' };
+  for (const raw of (text || '').split(/[\n.!?।]+/)) {
+    const sentence = raw.trim();
+    if (!sentence) continue;
+    const clusters = Object.keys(matchClusters(sentence));
+    const score = scoreClusters(clusters).score + clusters.length * 0.01;
+    if (score > best.score) best = { score, sentence };
+  }
+  return best.sentence.length > 200 ? `${best.sentence.slice(0, 197)}…` : best.sentence;
+}
+
 export const NUDGE_THRESHOLD = lexicon.nudge_threshold;
 export const CATEGORY_INFO = lexicon.categories;

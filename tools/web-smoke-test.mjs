@@ -87,17 +87,40 @@ try {
   await send('Page.navigate', { url: URL_UNDER_TEST });
   await sleep(2500);
 
-  // ---- App opens straight on the dashboard ----
-  await step('opens directly on the Home dashboard', async () => {
+  // ---- App opens straight on the protection dashboard ----
+  await step('opens directly on the protection dashboard', async () => {
+    check('opens directly on the protection dashboard', (await exists('#dashboard-status')) && (await exists('#nav-home.active')),
+      await js('document.querySelector("#dashboard-title")?.innerText || ""'));
+  });
+  await step('dashboard shows the protection numbers and cards', async () => {
     const t = await text();
-    check('opens directly on the Home dashboard', (await exists('#btn-listen')) && !t.includes('Open SATARK controls') && (await exists('#nav-home.active')));
+    check('dashboard shows the protection numbers and cards', ['Threats blocked today', 'Risk alerts', 'Last security scan', 'Link protection',
+      'Scam calls', 'Screen sharing', 'Network activity'].every(label => t.includes(label)));
+  });
+  await step('security scan runs and shows results', async () => {
+    await click('#btn-scan');
+    const ok = await waitFor('!!document.querySelector("#scan-checks li")', 5000);
+    check('security scan runs and shows results', ok && (await exists('#scan-summary')), await js('document.querySelector("#scan-summary")?.innerText || ""'));
+  });
+  await step('emergency safety checklist opens and closes', async () => {
+    await click('#btn-emergency');
+    await sleep(200);
+    const opened = (await exists('#emergency-checklist')) && (await attr('#btn-checklist-1930', 'href')) === 'tel:1930';
+    await click('#btn-checklist-close');
+    await sleep(200);
+    check('emergency safety checklist opens and closes', opened && !(await exists('#emergency-checklist')));
+  });
+  await step('Scam calls card opens the call guardian', async () => {
+    await click('#tile-calls');
+    await sleep(200);
+    check('Scam calls card opens the call guardian', (await exists('#btn-listen')) && (await exists('#nav-calls.active')));
   });
   await step('light theme background', async () => {
     const bg = await js('getComputedStyle(document.body).backgroundColor');
     check('light theme background', bg === 'rgb(245, 246, 248)', bg);
   });
 
-  // ---- Home ----
+  // ---- Calls (scam call guardian) ----
   await step('Start listening (web) explains it needs the app', async () => {
     await click('#btn-listen');
     await sleep(300);
@@ -123,6 +146,18 @@ try {
     await sleep(200);
     check('weak signs → "not enough for an alert"', (await text()).includes('not enough for an alert'));
   });
+  await step('critical word → alert pop-up', async () => {
+    check('no pop-up for weak signs', !(await exists('#critical-popup')));
+    await type('#message-input', 'Sir please share the OTP you just received');
+    await click('#btn-check');
+    await sleep(200);
+    check('critical word → alert pop-up', (await exists('#critical-popup')) && (await text()).includes('critical word detected'));
+    const heard = await js('document.querySelector("#critical-reasons .critical-context")?.innerText || ""');
+    check('pop-up shows where the critical word was heard', /share the otp you/i.test(heard), heard);
+    await click('#btn-critical-dismiss');
+    await sleep(200);
+    check('Dismiss closes the pop-up', !(await exists('#critical-popup')));
+  });
   await step('typing does not open the alert by itself', async () => {
     await type('#message-input', 'main police station se bol raha hoon kisi ko mat batana turant paise bhejo, near Punjabi University Patiala');
     await sleep(800);
@@ -132,6 +167,14 @@ try {
     await click('#btn-check');
     await sleep(200);
     check('scam message → alert banner', (await text()).includes("Possible 'digital arrest' scam"));
+  });
+  await step('possible scam without critical words → pop-up', async () => {
+    check('possible scam without critical words → pop-up', (await exists('#critical-popup')) && (await text()).includes('Alert: possible scam'),
+      await js('document.querySelector("#critical-scam-type")?.innerText || ""'));
+    const place = await js('document.querySelector("#critical-place")?.innerText || ""');
+    check('pop-up shows the place mentioned in the call', /Punjabi University/i.test(place), place);
+    await click('#btn-critical-dismiss');
+    await sleep(200);
   });
 
   // ---- Alert page ----
@@ -159,13 +202,13 @@ try {
     const href = await js('document.querySelector("#place-list a.find-phone")?.href || ""');
     check('nearby results have encoded "Find phone number" links', href.startsWith('https://www.google.com/maps/search/?api=1&query=') && !href.includes(' '), href.slice(0, 90));
   });
-  await step('Back button returns to Home', async () => {
+  await step('Back button returns to the call guardian', async () => {
     await click('#btn-alert-back');
     await sleep(300);
-    check('Back button returns to Home', (await exists('#btn-listen')) && (await exists('.bottom-nav')));
+    check('Back button returns to the call guardian', (await exists('#btn-listen')) && (await exists('.bottom-nav')));
   });
-  await step('Home keeps the checked message after going back', async () => {
-    check('Home keeps the checked message after going back', (await js('document.querySelector("#message-input").value')).includes('police station') && (await exists('#btn-check-details')));
+  await step('the call guardian keeps the checked message after going back', async () => {
+    check('the call guardian keeps the checked message after going back', (await js('document.querySelector("#message-input").value')).includes('police station') && (await exists('#btn-check-details')));
   });
   await step('Done button returns to Home', async () => {
     await click('#btn-check-details');
@@ -173,6 +216,14 @@ try {
     await click('#btn-alert-done');
     await sleep(300);
     check('Done button returns to Home', await exists('#btn-listen'));
+  });
+  await step('warning page shows the statement that triggered it', async () => {
+    await click('#btn-check-details');
+    await sleep(300);
+    const trigger = await js('document.querySelector("#alert-trigger")?.innerText || ""');
+    await click('#btn-alert-done');
+    await sleep(300);
+    check('warning page shows the statement that triggered it', /Triggered by/.test(trigger), trigger.slice(0, 90));
   });
 
   // ---- Nearby tab ----
@@ -195,11 +246,11 @@ try {
     await type('#nearby-query', before);
     check('Search is disabled while empty', disabled);
   });
-  await step('Search "Patiala" shows map and places', async () => {
+  await step('Search "Patiala" shows places without a map', async () => {
     await type('#nearby-query', 'Patiala');
     await click('#btn-nearby-search');
     const ok = await waitFor('!!document.querySelector("#place-list") || !!document.querySelector("#nearby-message.danger")', 60000);
-    check('Search "Patiala" shows map and places', ok && (await exists('#place-list')) && (await exists('.leaflet-container')),
+    check('Search "Patiala" shows places without a map', ok && (await exists('#place-list')) && !(await exists('.leaflet-container')),
       (await js('document.querySelector("#nearby-message")?.textContent || ""')).slice(0, 80));
   });
   for (const id of ['shop', 'pharmacy', 'police', 'cybercrime', 'bank', 'hospital']) {
@@ -212,6 +263,8 @@ try {
       const active = await exists(`#cat-${id}.active`);
       const outcome = await js('document.querySelectorAll("#place-list .place").length + " places; " + (document.querySelector("#nearby-message")?.textContent || "")');
       check(`category "${id}" button`, done && active, outcome.slice(0, 90));
+      // OSM has no police station within 10 km of central Patiala: the search must widen to find one.
+      if (id === 'police') check('police search widens until it finds a station', !outcome.startsWith('0 places'), outcome.slice(0, 120));
     });
   }
   await step('radius select changes the search', async () => {
@@ -232,9 +285,56 @@ try {
     check('unknown place gives a helpful message', (await js('document.querySelector("#nearby-message")?.textContent || ""')).includes('not found'));
   });
 
+  // ---- Links in messages + one connected incident ----
+  await step('message with a fake bank link → dangerous link warning', async () => {
+    await click('#nav-calls');
+    await type('#message-input', 'Dear customer your SBI account will be blocked today. Update KYC at https://sbi-kyc-update.com/login and share the OTP');
+    await click('#btn-check');
+    await waitFor('!!document.querySelector("#check-links-danger")', 5000);
+    if (await exists('#critical-popup')) await click('#btn-critical-dismiss');
+    await sleep(200);
+    const banner = await js('document.querySelector("#check-links-danger")?.innerText || ""');
+    check('message with a fake bank link → dangerous link warning', banner.includes('sbi-kyc-update.com'), banner.slice(0, 100));
+  });
+  await step('dashboard joins the scam message and the link into one high-risk incident', async () => {
+    await click('#nav-home');
+    await waitFor('/High risk/.test(document.querySelector("#dashboard-title")?.innerText || "")', 8000);
+    const title = await js('document.querySelector("#dashboard-title")?.innerText || ""');
+    const timeline = await js('document.querySelector("#timeline")?.innerText || ""');
+    check('dashboard joins the scam message and the link into one high-risk incident',
+      title.includes('High risk') && timeline.includes('dangerous link') && (await exists('#risk-alerts')), title);
+  });
+  await step('"I\'m safe — dismiss" clears the current alerts', async () => {
+    await click('#btn-dismiss-alerts');
+    await waitFor('!document.querySelector("#risk-alerts")', 5000);
+    check('"I\'m safe — dismiss" clears the current alerts', !(await exists('#risk-alerts')) && !/High risk/.test(await js('document.querySelector("#dashboard-title")?.innerText || ""')));
+  });
+
+  // ---- Protect: link checker ----
+  await step('Protect tab checks a disguised shopping link', async () => {
+    await click('#nav-protect');
+    await type('#link-input', 'amaz0n-offer.in/win');
+    await click('#btn-link-check');
+    await waitFor('!!document.querySelector("#link-verdict")', 5000);
+    const verdict = await js('document.querySelector("#link-verdict")?.innerText || ""');
+    check('Protect tab checks a disguised shopping link', verdict.includes('Dangerous') && (await exists('#shield-web-note')), verdict.slice(0, 90));
+  });
+  await step('a short link is explained, an official site is not flagged', async () => {
+    await type('#link-input', 'https://bit.ly/3abc');
+    await click('#btn-link-check');
+    await sleep(200);
+    const short = await js('document.querySelector("#link-verdict")?.innerText || ""');
+    await type('#link-input', 'https://www.onlinesbi.sbi');
+    await click('#btn-link-check');
+    await sleep(200);
+    const official = await js('document.querySelector("#link-verdict")?.innerText || ""');
+    check('a short link is explained, an official site is not flagged', short.includes('Short link') && official.includes('Official site'), `${short.slice(0, 40)} | ${official.slice(0, 40)}`);
+  });
+
   // ---- Payment check ----
   await step('Payment tab opens with demo label', async () => {
-    await click('#nav-payment');
+    await click('#nav-home');
+    await click('#btn-open-payment');
     await sleep(300);
     check('Payment tab opens with demo label', (await text()).includes('simulated UPI app') && (await exists('#upi-form')));
   });
@@ -357,7 +457,8 @@ try {
     check('settings are encrypted in local storage', stored.length > 0 && !stored.includes('9812345678') && !stored.includes('Priya'));
   });
   await step('pause offers to tell the trusted contact', async () => {
-    await click('#nav-payment');
+    await click('#nav-home');
+    await click('#btn-open-payment');
     await sleep(300);
     await type('#demo-scenario', 'distressed_relative');
     await sleep(500);
@@ -379,7 +480,7 @@ try {
   // ---- Navigation ----
   await step('every tab button works', async () => {
     let ok = true;
-    for (const id of ['home', 'nearby', 'payment', 'settings', 'home']) {
+    for (const id of ['home', 'calls', 'protect', 'nearby', 'settings', 'home']) {
       await click(`#nav-${id}`);
       await sleep(150);
       ok = ok && (await exists(`#nav-${id}.active`));

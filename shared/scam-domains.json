@@ -1,0 +1,30 @@
+{
+  "note": "Domains checked on the phone by the web shield and the link checker. 'blocked' holds known scam domains (suffix match; DEMO entry only — the downloaded threat list adds real reports). 'official' domains are never blocked. A domain is a look-alike when one of its labels names a brand and it also uses a bait word, but it is not under an official domain. Official site names are also used to catch typo-squats. 'shorteners' hide where a link goes.",
+  "blocked": [
+    "satark-scam-test.in"
+  ],
+  "official": [
+    "gov.in", "nic.in", "bank.in", "sbi", "sbi.co.in", "onlinesbi.com", "sbicard.com", "hdfcbank.com", "hdfc.com", "hdfcbank.net",
+    "icicibank.com", "icici.com", "axisbank.com", "axis.com", "pnbindia.in", "kotak.com", "bankofbaroda.in", "canarabank.com",
+    "unionbankofindia.co.in", "paytm.com", "paytm.in", "paytmbank.com", "paytmpayments.com", "phonepe.com", "npci.org.in", "bhimupi.org.in",
+    "rbi.org.in", "uidai.gov.in", "incometax.gov.in", "epfindia.gov.in", "google.com", "googleapis.com", "gstatic.com",
+    "amazon.in", "amazon.com", "amazonpay.in", "amazonaws.com", "media-amazon.com", "ssl-images-amazon.com", "amazon-adsystem.com",
+    "flipkart.com", "flipkart.net", "flixcart.com", "myntra.com", "myntassets.com", "meesho.com", "snapdeal.com", "nykaa.com", "ajio.com",
+    "bigbasket.com", "tatacliq.com", "jiomart.com", "whatsapp.net", "whatsapp.com", "airtel.in", "jio.com", "irctc.co.in"
+  ],
+  "brands": {
+    "whole": ["sbi", "rbi", "upi", "pnb", "axis", "kyc"],
+    "part": ["hdfc", "icici", "paytm", "phonepe", "yono", "npci", "bhim", "incometax", "epfo", "aadhaar", "aadhar", "uidai", "kotak", "canara",
+      "airtel", "jiomart", "irctc", "amazon", "flipkart", "myntra", "meesho", "snapdeal", "nykaa", "bigbasket", "tatacliq"]
+  },
+  "bait": [
+    "kyc", "update", "verify", "verification", "reward", "rewards", "refund", "cashback", "secure", "login", "unblock", "blocked", "suspend",
+    "otp", "bonus", "claim", "points", "redeem", "helpdesk", "support", "care", "pan", "link", "activation", "activate", "gift", "lucky",
+    "sale", "offer", "offers", "deal", "deals", "discount", "festival", "diwali", "free", "winner", "prize", "spin", "mega", "bigsale",
+    "megasale", "bigbillion", "giveaway"
+  ],
+  "shorteners": [
+    "bit.ly", "bitly.com", "tinyurl.com", "cutt.ly", "is.gd", "v.gd", "rb.gy", "shorturl.at", "tiny.cc", "ow.ly", "rebrand.ly", "s.id",
+    "t.ly", "u.gy", "short.gy", "goo.su", "shorturl.asia", "clck.ru", "tinu.be", "l.ead.me", "bl.ink", "surl.li", "qrco.de"
+  ]
+}

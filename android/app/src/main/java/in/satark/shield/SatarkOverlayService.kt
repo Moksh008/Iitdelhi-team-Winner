@@ -183,6 +183,8 @@ class SatarkOverlayService : Service() {
     private var lastLevelPublish = 0L
     private var alert by mutableStateOf<SatarkRules.Result?>(null)
     private var alertExcerpt = ""
+    /** The statement that raised (or last raised) the alert. */
+    private var alertTrigger = ""
 
     override fun onCreate() {
         super.onCreate()
@@ -430,8 +432,12 @@ class SatarkOverlayService : Service() {
         if (result.actionTier > 0) {
             val previous = alert
             if (previous == null || result.conversationScore > previous.conversationScore || result.category != previous.category) {
+                // A scam call: cut screen-sharing apps off the internet (if the user allowed it).
+                if (previous == null) DnsShieldService.onScamAlert(this)
                 alert = result
                 alertExcerpt = transcript.takeLast(400)
+                alertTrigger = text.trim()
+                SecurityCenter.onScamCall(this, result.title ?: "possible scam", alertTrigger)
                 if (!MainActivity.isInForeground) expanded = true
             }
         }
@@ -510,6 +516,7 @@ class SatarkOverlayService : Service() {
         put("title", result.title)
         put("advice", result.advice)
         put("transcript_excerpt", alertExcerpt)
+        put("trigger", alertTrigger)
         put("indicators", JSONArray().apply {
             result.indicators.forEach { indicator ->
                 put(JSONObject().put("cluster", indicator.cluster).put("label", indicator.label).put("terms", JSONArray(indicator.terms)))
@@ -712,7 +719,8 @@ class SatarkOverlayService : Service() {
                                         color = Color(0xFF374151)
                                     )
                                     Text(
-                                        text = "“…${alertExcerpt.replace('\n', ' ').takeLast(110)}”",
+                                        text = if (alertTrigger.isNotBlank()) "Triggered by: “${alertTrigger.take(140)}”"
+                                        else "“…${alertExcerpt.replace('\n', ' ').takeLast(110)}”",
                                         fontSize = 11.sp,
                                         color = Color(0xFF5B6474),
                                         modifier = Modifier.background(Color(0xFFF1F3F6), RoundedCornerShape(6.dp)).padding(6.dp)

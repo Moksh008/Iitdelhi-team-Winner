@@ -2,7 +2,7 @@ import React from 'react';
 import { AlertTriangle, CheckCircle2, Info } from 'lucide-react';
 
 /** Outcome of the on-device rules for a checked message or recording. */
-export default function RuleResult({ result, onAlert, idPrefix = 'check' }) {
+export default function RuleResult({ result, onAlert, idPrefix = 'check', hideSafe = false }) {
   if (!result) return null;
   if (result.action_tier > 0) {
     return (
@@ -11,6 +11,7 @@ export default function RuleResult({ result, onAlert, idPrefix = 'check' }) {
         <div>
           <strong>{result.title}</strong>
           <p>{result.advice}</p>
+          {result.trigger && <p className="trigger-line" id={`${idPrefix}-trigger`}>Triggered by: “{result.trigger}”</p>}
           <button type="button" id={`btn-${idPrefix}-details`} className="btn btn-danger" onClick={() => onAlert(result)}>
             View details & nearby help
           </button>
@@ -26,6 +27,7 @@ export default function RuleResult({ result, onAlert, idPrefix = 'check' }) {
       </div>
     );
   }
+  if (hideSafe) return null;
   return (
     <div className="notice success result-line" id={`${idPrefix}-result`}>
       <CheckCircle2 size={16} /> No scam signs found. Still verify before paying anyone new.

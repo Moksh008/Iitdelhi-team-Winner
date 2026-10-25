@@ -44,5 +44,40 @@ export const SatarkNative = {
   /** Alert the overlay asked the app to open in full (or null). */
   takePendingAlert: () => (plugin ? plugin.takePendingAlert() : Promise.resolve({ alert: null })),
 
+  // ---- Web shield (local VPN): scam-link blocking, remote-access lock, per-app network log ----
+  /** { running, permission, mode: 'off'|'filter'|'lock', lockedUntil, autoLock, remoteAccessApps, allowedDomains, checked, blocked, error } */
+  getShieldState: () => (plugin ? plugin.getShieldState() : unavailable()),
+  /** Android asks the user to allow the VPN the first time: { status: 'started' | 'denied' }. */
+  startShield: () => (plugin ? plugin.startShield() : unavailable()),
+  stopShield: () => (plugin ? plugin.stopShield() : unavailable()),
+  /** { status: 'locked' | 'needs_shield' | 'no_apps' } */
+  lockRemoteAccess: options => (plugin ? plugin.lockRemoteAccess(options || {}) : unavailable()),
+  unlockRemoteAccess: () => (plugin ? plugin.unlockRemoteAccess() : unavailable()),
+  setShieldOptions: options => (plugin ? plugin.setShieldOptions(options) : unavailable()),
+  allowDomain: options => (plugin ? plugin.allowDomain(options) : unavailable()),
+  /** { entries: [{ time, lastTime, app, packageName, target, kind, action, reason, detail, count }], checked, blocked } */
+  getNetworkLog: options => (plugin ? plugin.getNetworkLog(options || {}) : unavailable({ entries: [] })),
+  clearNetworkLog: () => (plugin ? plugin.clearNetworkLog() : unavailable()),
+
+  // ---- Protection dashboard, incident timeline, security scan, link checks ----
+  getDashboard: () => (plugin ? plugin.getDashboard() : unavailable()),
+  runSecurityScan: () => (plugin ? plugin.runSecurityScan() : unavailable()),
+  dismissRiskAlerts: () => (plugin ? plugin.dismissRiskAlerts() : unavailable()),
+  clearSecurityEvents: () => (plugin ? plugin.clearSecurityEvents() : unavailable()),
+  /** { kind: 'scam_message' | 'scam_recording' | 'link_flagged', title, detail } */
+  recordSecurityEvent: event => (plugin ? plugin.recordSecurityEvent(event) : unavailable()),
+  /** Downloads the latest phishing / malware domain list: { count, updatedAt, updating, error }. */
+  updateThreatFeed: () => (plugin ? plugin.updateThreatFeed() : unavailable()),
+  /** { status: 'ok', host, blocked, reason, detail, shortener, official, allowed } */
+  checkLink: options => (plugin ? plugin.checkLink(options) : unavailable()),
+  /** Follows a short link hop by hop (never opening the final page): { hops, final, verdict, error }. */
+  expandLink: options => (plugin ? plugin.expandLink(options) : unavailable()),
+  /** { usageAccess, anyActive, anyAccessibility, apps: [...], otherAccessibility: [...] } */
+  getRemoteAccessStatus: () => (plugin ? plugin.getRemoteAccessStatus() : unavailable({ apps: [], otherAccessibility: [] })),
+  openAppInfo: options => (plugin ? plugin.openAppInfo(options) : unavailable()),
+  uninstallApp: options => (plugin ? plugin.uninstallApp(options) : unavailable()),
+  /** page: accessibility | usage | airplane | private_dns | developer | security | overlay | vpn */
+  openSettingsPage: options => (plugin ? plugin.openSettingsPage(options) : unavailable()),
+
   addListener: (event, handler) => (plugin ? plugin.addListener(event, handler) : Promise.resolve({ remove: () => {} })),
 };

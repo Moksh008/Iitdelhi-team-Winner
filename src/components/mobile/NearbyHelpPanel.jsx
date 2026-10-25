@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ExternalLink, MapPin, Phone, Search } from 'lucide-react';
-import OsmMap from './OsmMap';
 import { PLACE_CATEGORIES, MAX_RESULTS, categorySearchUrl, resolvePlace, searchNearby } from '../../services/osmPlaces';
 
-const RADII_KM = [1, 3, 5, 10];
+const RADII_KM = [1, 3, 5, 10, 20];
 
 /**
  * Finds hospitals, police, banks etc. near the place mentioned in the call (or a
@@ -33,19 +32,43 @@ export default function NearbyHelpPanel({ initialQuery = '', preferredCategory =
     // Never show the previous category's places under the new one.
     setPlaces([]);
     try {
-      const result = await searchNearby({ lat: center.lat, lon: center.lon, categoryId, radiusKm: radius, locality: center.locality });
+      // Nothing mapped within the chosen radius (common for police in smaller
+      // towns): widen step by step so the user still gets the nearest help.
+      let result = await searchNearby({ lat: center.lat, lon: center.lon, categoryId, radiusKm: radius, locality: center.locality });
       if (seq !== searchSeq.current) return; // a newer search has started
+      let usedRadius = radius;
+      let widenFailed = false;
+      for (const km of RADII_KM.filter(value => value > radius)) {
+        if (result.places.length) break;
+        try {
+          const wider = await searchNearby({ lat: center.lat, lon: center.lon, categoryId, radiusKm: km, locality: center.locality });
+          if (seq !== searchSeq.current) return;
+          result = wider;
+          usedRadius = km;
+        } catch {
+          // Keep what was found; say the wider search could not run.
+          widenFailed = true;
+          break;
+        }
+      }
       setPlaces(result.places);
       setRetrievedAt(result.retrievedAt);
       setStatus('done');
+      const label = PLACE_CATEGORIES.find(item => item.id === categoryId)?.label.toLowerCase();
+      const notes = [];
+      if (result.places.length && usedRadius > radius) {
+        notes.push(`No ${label} are mapped within ${radius} km, so these are the nearest within ${usedRadius} km.`);
+      }
       if (result.source === 'nominatim' && result.places.length) {
-        setMessage('The OpenStreetMap places service was busy, so these results come from the OpenStreetMap search service instead and may be less complete.');
+        notes.push('The OpenStreetMap places service was busy, so these results come from the OpenStreetMap search service instead and may be less complete.');
       }
       if (!result.places.length) {
-        setMessage(categoryId === 'cybercrime'
+        notes.push(categoryId === 'cybercrime'
           ? 'No cybercrime police station is mapped on OpenStreetMap near here. You can still call the national helpline 1930 or use cybercrime.gov.in.'
-          : `No ${PLACE_CATEGORIES.find(item => item.id === categoryId)?.label.toLowerCase()} are mapped on OpenStreetMap within ${radius} km. Try a larger radius — not every place is on OpenStreetMap.`);
+          : `No ${label} are mapped on OpenStreetMap within ${usedRadius} km — not every place is on OpenStreetMap. Use the public map search below.`);
+        if (widenFailed) notes.push('A wider search could not run right now (the map service is busy) — try again in a minute.');
       }
+      setMessage(notes.join(' '));
     } catch (error) {
       if (seq !== searchSeq.current) return;
       setPlaces([]);
@@ -159,14 +182,10 @@ export default function NearbyHelpPanel({ initialQuery = '', preferredCategory =
       {busy && <p className="notice" role="status">{status === 'locating' ? 'Finding the place…' : 'Searching OpenStreetMap…'}</p>}
       {message && <p className={`notice ${status === 'error' ? 'danger' : 'warning'}`} role={status === 'error' ? 'alert' : 'status'} id="nearby-message">{message}</p>}
 
-      {status === 'error' && origin && (
+      {origin && (status === 'error' || (status === 'done' && !places.length)) && (
         <a className="btn btn-ghost" href={categorySearchUrl(categoryInfo.label, origin.locality || origin.matchedQuery || '')} target="_blank" rel="noopener noreferrer">
           <ExternalLink size={14} /> Search {categoryInfo.label.toLowerCase()} on a public map instead
         </a>
-      )}
-
-      {origin && places.length > 0 && (
-        <OsmMap center={origin} places={places} selectedId={selectedId} onSelect={setSelectedId} />
       )}
 
       {places.length > 0 && (

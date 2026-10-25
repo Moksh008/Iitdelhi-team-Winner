@@ -9,6 +9,8 @@ import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
     private static final int NOTIFICATION_REQUEST = 3202;
+    /** Set on notification taps: which screen to open ("home"). */
+    public static final String EXTRA_OPEN = "satark_open";
 
     /** True while the Satark screen is visible; the overlay stays a small bubble then. */
     public static volatile boolean isInForeground = false;
@@ -25,7 +27,11 @@ public class MainActivity extends BridgeActivity {
         super.onNewIntent(intent);
         // The overlay's "Details & nearby help" brings the app forward with a pending alert.
         SatarkNativePlugin plugin = SatarkNativePlugin.Companion.getInstance();
-        if (plugin != null) plugin.notifyAlertOpened();
+        if (plugin == null) return;
+        String screen = intent.getStringExtra(EXTRA_OPEN);
+        // A threat notification opens the protection dashboard; the overlay opens its alert.
+        if (screen != null) plugin.notifyOpenScreen(screen);
+        else plugin.notifyAlertOpened();
     }
 
     @Override

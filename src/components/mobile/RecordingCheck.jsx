@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { FileAudio } from 'lucide-react';
 import { SatarkNative, isNativeApp } from '../../native/satarkNative';
 import RuleResult from './RuleResult';
+import { findTriggerStatement } from '../../engine/localAnalyzer';
+import { recordSecurityEvent } from '../../services/securityEvents';
 
 const clock = seconds => {
   const s = Math.max(0, Math.floor(seconds || 0));
@@ -13,7 +15,7 @@ const clock = seconds => {
  * file; it is turned into text on the phone and checked by the same rules as a
  * live call. Works even though Android mutes other apps' microphones during calls.
  */
-export default function RecordingCheck({ engine, onAlert }) {
+export default function RecordingCheck({ engine, onAlert, onCritical }) {
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState('');
   const [error, setError] = useState('');
@@ -43,10 +45,16 @@ export default function RecordingCheck({ engine, onAlert }) {
     for (const segment of outcome.segments) analysis = engine.ingestChunk(segment.text).analysis;
     engine.endCallSession();
     const transcript = outcome.segments.map(segment => segment.text).join('\n');
+    const trigger = analysis?.action_tier > 0 ? findTriggerStatement(transcript) : '';
+    const checked = analysis
+      ? { ...analysis, transcript_excerpt: transcript.slice(-400), trigger }
+      : { action_tier: 0, indicators: [], transcript_excerpt: '' };
     setRecording(outcome);
-    setResult(analysis
-      ? { ...analysis, transcript_excerpt: transcript.slice(-400) }
-      : { action_tier: 0, indicators: [], transcript_excerpt: '' });
+    setResult(checked);
+    if (analysis) onCritical?.(transcript, checked);
+    if (analysis?.action_tier > 0) {
+      recordSecurityEvent({ kind: 'scam_recording', title: `Scam recording: ${analysis.title}`, detail: trigger ? `Triggered by: “${trigger}”` : '' });
+    }
   };
 
   const run = async (action) => {
@@ -67,13 +75,13 @@ export default function RecordingCheck({ engine, onAlert }) {
 
   return (
     <section className="card" id="recording-card">
-      <div className="card-title"><FileAudio size={18} /> <h2>Check a recording</h2></div>
+      <div className="card-title"><FileAudio size={18} /> <h2>Upload a recording</h2></div>
       <p className="muted">
         Pick a voice note, call recording or any audio file. Satark turns it into text on this phone and checks it for scam signs.
       </p>
       {isNativeApp ? (
         <button type="button" id="btn-pick-recording" className="btn btn-primary btn-block" onClick={() => run(() => SatarkNative.pickRecording())} disabled={busy}>
-          {busy ? 'Checking…' : 'Choose a recording'}
+          {busy ? 'Checking…' : 'Upload recording'}
         </button>
       ) : (
         <p className="notice" id="recording-web-note">Checking recordings works in the Android app, where speech is turned into text on the phone.</p>

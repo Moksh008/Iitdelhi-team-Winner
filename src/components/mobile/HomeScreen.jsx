@@ -1,19 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { AlertTriangle, Mic, Square } from 'lucide-react';
+import { AlertTriangle, Link2, Mic, ShieldAlert, Square } from 'lucide-react';
 import { SatarkNative, isNativeApp } from '../../native/satarkNative';
 import RecordingCheck from './RecordingCheck';
 import RuleResult from './RuleResult';
+import { extractLinks, REASON_TEXT } from '../../engine/linkRules';
+import { findTriggerStatement } from '../../engine/localAnalyzer';
+import { checkLink } from '../../services/linkCheck';
+import { recordSecurityEvent } from '../../services/securityEvents';
 
 /**
- * Home: start/stop on-device listening, see what was heard live, and check a
- * pasted message with the same local rules. Nothing here leaves the phone.
+ * Scam call guardian: start/stop on-device listening, see what was heard live,
+ * check a recording, and check a pasted message (its words and its links) with
+ * the same local rules. Nothing here leaves the phone.
  */
-export default function HomeScreen({ engine, onAlert }) {
+export default function HomeScreen({ engine, onAlert, onCritical }) {
   const [live, setLive] = useState(null);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState('');
   const [message, setMessage] = useState('');
   const [result, setResult] = useState(null);
+  const [links, setLinks] = useState(null);
 
   useEffect(() => {
     let listener;
@@ -58,19 +64,38 @@ export default function HomeScreen({ engine, onAlert }) {
     setNotice('Stopped. Nothing is being recorded.');
   };
 
-  const check = () => {
+  const check = async () => {
     const text = message.trim();
     if (!text) return;
     // Each checked message is judged on its own.
     engine.startCallSession({ source: 'manual' });
     const { analysis } = engine.ingestChunk(text);
-    setResult({ ...analysis, transcript_excerpt: text });
+    const trigger = analysis.action_tier > 0 ? findTriggerStatement(text) : '';
+    const checked = { ...analysis, transcript_excerpt: text, trigger };
+    setResult(checked);
+    onCritical?.(text, checked);
+    if (analysis.action_tier > 0) {
+      recordSecurityEvent({ kind: 'scam_message', title: `Scam message: ${analysis.title}`, detail: trigger ? `Triggered by: “${trigger}”` : text.slice(0, 160) });
+    }
+    // Links in the message are checked too (on Android also against the reported-phishing list).
+    const found = extractLinks(text);
+    setLinks(found.length ? 'checking' : null);
+    if (!found.length) return;
+    const verdicts = await Promise.all(found.map(link => checkLink(link.url)));
+    setLinks(verdicts);
+    const dangerous = verdicts.find(verdict => verdict.blocked);
+    if (dangerous) {
+      recordSecurityEvent({ kind: 'link_flagged', title: `Dangerous link in a message: ${dangerous.host}`, detail: `${dangerous.host} ${dangerous.detail}.` });
+    }
   };
 
   const clear = () => {
     setMessage('');
     setResult(null);
+    setLinks(null);
   };
+
+  const dangerousLinks = Array.isArray(links) ? links.filter(link => link.blocked) : [];
 
   const statusText = listening
     ? live?.status || 'Listening'
@@ -78,6 +103,9 @@ export default function HomeScreen({ engine, onAlert }) {
 
   return (
     <>
+      {/* Uploading a recording comes first: it works even where the live microphone is unreliable. */}
+      <RecordingCheck engine={engine} onAlert={onAlert} onCritical={onCritical} />
+
       <section className="card listen-card" aria-label="Listening">
         <button
           type="button"
@@ -135,8 +163,6 @@ export default function HomeScreen({ engine, onAlert }) {
         </section>
       )}
 
-      <RecordingCheck engine={engine} onAlert={onAlert} />
-
       <section className="card">
         <h2>Check a message</h2>
         <div className="field">
@@ -145,7 +171,7 @@ export default function HomeScreen({ engine, onAlert }) {
             id="message-input"
             className="textarea"
             value={message}
-            onChange={event => { setMessage(event.target.value); setResult(null); }}
+            onChange={event => { setMessage(event.target.value); setResult(null); setLinks(null); }}
             placeholder="e.g. Your KYC is pending, share the OTP or your account will be blocked"
           />
         </div>
@@ -154,8 +180,33 @@ export default function HomeScreen({ engine, onAlert }) {
           <button type="button" id="btn-clear" className="btn btn-secondary" onClick={clear} disabled={!message && !result}>Clear</button>
         </div>
 
-        <RuleResult result={result} onAlert={onAlert} idPrefix="check" />
-        <p className="fine-print">Checked on this phone. Nothing you paste is sent anywhere.</p>
+        {dangerousLinks.length > 0 && (
+          <div className="alert-banner" role="alert" id="check-links-danger">
+            <ShieldAlert size={22} />
+            <div>
+              <strong>Dangerous link{dangerousLinks.length > 1 ? 's' : ''} — don’t open</strong>
+              {dangerousLinks.map(link => (
+                <p key={link.host}><strong>{link.host}</strong>: {REASON_TEXT[link.reason] || 'dangerous'} — it {link.detail}.</p>
+              ))}
+            </div>
+          </div>
+        )}
+        <RuleResult result={result} onAlert={onAlert} idPrefix="check" hideSafe={dangerousLinks.length > 0} />
+        {Array.isArray(links) && links.length > dangerousLinks.length && (
+          <ul className="list" id="check-links">
+            {links.filter(link => !link.blocked).map(link => (
+              <li key={link.host}>
+                <Link2 size={13} /> <strong>{link.host}</strong>{' '}
+                <span className="muted">
+                  {link.shortener ? '— a short link that hides where it goes; check it in Protect before opening'
+                    : link.official ? '— official site' : '— no known danger found'}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+        {links === 'checking' && <p className="muted">Checking links…</p>}
+        <p className="fine-print">Words and links are checked on this phone. Nothing you paste is sent anywhere.</p>
       </section>
     </>
   );

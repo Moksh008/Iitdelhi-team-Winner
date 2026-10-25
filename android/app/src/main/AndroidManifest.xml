@@ -9,6 +9,10 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- The web shield's per-app network log names the app behind each lookup. -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" tools:ignore="QueryAllPackagesPermission" />
+    <!-- Optional (user grants it in Settings): tells when a screen-sharing app is running. -->
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions" />
     <!-- Added by ONNX Runtime only for its telemetry uploader, which is removed below. -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" tools:node="remove" />
     <!-- Satark never uses the phone's location: the place comes from the call transcript. -->
@@ -51,6 +55,20 @@
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="Floating scam-warning bubble shown over other apps during calls" />
+        </service>
+
+        <!-- Web shield: a local VPN that checks DNS lookups on the phone and can cut
+             screen-sharing apps off during a scam call. Nothing leaves the phone. -->
+        <service
+            android:name=".DnsShieldService"
+            android:exported="false"
+            android:permission="android.permission.BIND_VPN_SERVICE">
+            <intent-filter>
+                <action android:name="android.net.VpnService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.net.VpnService.SUPPORTS_ALWAYS_ON"
+                android:value="true" />
         </service>
 
         <!-- ONNX Runtime's AAR registers an HTTP telemetry uploader that starts with

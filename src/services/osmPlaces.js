@@ -342,15 +342,19 @@ export async function searchNearby({ lat, lon, categoryId, radiusKm, locality = 
     let payload = null;
     let lastError = new Error('Request timed out');
     if (Date.now() >= overpassDownUntil) {
-      for (const url of OVERPASS_URLS) {
-        try {
-          payload = await httpRequest({ url, method: 'POST', data: { data: query }, timeoutMs: 12000 });
-          break;
-        } catch (error) {
-          lastError = error;
-        }
+      // Ask the instances together and take the first answer, so a dead
+      // instance costs one 10 s timeout instead of 12 s each, one after another.
+      try {
+        payload = await Promise.any(OVERPASS_URLS.map(url =>
+          httpRequest({ url, method: 'POST', data: { data: query }, timeoutMs: 10000 })
+            .then(result => {
+              if (!Array.isArray(result?.elements)) throw new Error('unexpected Overpass reply');
+              return result;
+            })));
+      } catch (error) {
+        lastError = error.errors?.[0] || error;
+        overpassDownUntil = Date.now() + OVERPASS_COOLDOWN_MS;
       }
-      if (!payload) overpassDownUntil = Date.now() + OVERPASS_COOLDOWN_MS;
     }
     let elements;
     let source = 'overpass';
@@ -362,7 +366,9 @@ export async function searchNearby({ lat, lon, categoryId, radiusKm, locality = 
       try {
         elements = await nominatimCategorySearch(category, lat, lon, radiusM);
         source = 'nominatim';
-      } catch {
+      } catch (fallbackError) {
+        // Both services failed; a rate limit is the more useful thing to tell the user.
+        if (/HTTP 429/.test(fallbackError?.message || '')) throw new Error(friendlyError(fallbackError, 'OpenStreetMap'));
         throw new Error(friendlyError(lastError, 'The OpenStreetMap places service (Overpass)'));
       }
     }
